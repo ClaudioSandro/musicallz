@@ -7,17 +7,20 @@ import '../../core/constants/app_colors.dart';
 import '../../features/library/domain/entities/song.dart';
 import '../../features/library/presentation/widgets/cover_art.dart';
 import '../../features/player/presentation/providers/player_providers.dart';
+import '../../features/playlists/data/models/playlist.dart';
+import '../../features/playlists/presentation/providers/playlist_providers.dart';
+import '../../features/playlists/presentation/widgets/add_to_playlist_sheet.dart';
 
 /// Opens a Spotify-style bottom-sheet context menu for [song].
 ///
-/// Actions are wired where existing playback capabilities allow (Play); the
-/// remaining advanced actions (Add to playlist, Share, File info) are shown as
-/// informational placeholders and are intentionally non-mutating.
+/// Playback uses the current [queue] (defaults to just the song). When
+/// [playlist] is provided, an extra "Remove from playlist" action is shown.
 Future<void> openSongContextMenu(
   BuildContext context,
   WidgetRef ref,
   Song song, {
   List<Song>? queue,
+  Playlist? playlist,
 }) {
   return showModalBottomSheet<void>(
     context: context,
@@ -25,15 +28,20 @@ Future<void> openSongContextMenu(
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
-    builder: (context) => _SongContextMenu(song: song, queue: queue),
+    builder: (context) => _SongContextMenu(
+      song: song,
+      queue: queue,
+      playlist: playlist,
+    ),
   );
 }
 
 class _SongContextMenu extends ConsumerWidget {
-  const _SongContextMenu({required this.song, this.queue});
+  const _SongContextMenu({required this.song, this.queue, this.playlist});
 
   final Song song;
   final List<Song>? queue;
+  final Playlist? playlist;
 
   void _placeholder(BuildContext context, String message) {
     HapticFeedback.selectionClick();
@@ -52,16 +60,20 @@ class _SongContextMenu extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final list = queue ?? [song];
+    final isFavorite = ref.watch(isFavoriteProvider(song.id));
+    final favoritesRepo = ref.read(favoritesRepositoryProvider);
+    final currentPlaylist = playlist;
 
     Widget item({
       required IconData icon,
       required String label,
       VoidCallback? onTap,
+      Color? color,
     }) {
       return ListTile(
         leading: Icon(
           icon,
-          color: onTap == null ? theme.colorScheme.onSurfaceVariant : null,
+          color: color ?? theme.colorScheme.onSurfaceVariant,
         ),
         title: Text(
           label,
@@ -135,8 +147,36 @@ class _SongContextMenu extends ConsumerWidget {
             item(
               icon: Icons.playlist_add,
               label: 'Add to playlist',
-              onTap: () => _placeholder(context, 'Add to playlist'),
+              onTap: () {
+                HapticFeedback.selectionClick();
+                Navigator.of(context).pop();
+                showAddToPlaylistSheet(context, ref, song);
+              },
             ),
+            item(
+              icon: isFavorite ? Icons.favorite : Icons.favorite_border,
+              label: isFavorite
+                  ? 'Remove from Liked Songs'
+                  : 'Add to Liked Songs',
+              color: isFavorite ? AppColors.accent : null,
+              onTap: () {
+                HapticFeedback.selectionClick();
+                favoritesRepo.toggle(song.id);
+                Navigator.of(context).pop();
+              },
+            ),
+            if (currentPlaylist != null)
+              item(
+                icon: Icons.playlist_remove,
+                label: 'Remove from ${currentPlaylist.name}',
+                onTap: () {
+                  HapticFeedback.selectionClick();
+                  ref
+                      .read(playlistRepositoryProvider)
+                      .removeSong(currentPlaylist.id, song.id);
+                  Navigator.of(context).pop();
+                },
+              ),
             item(
               icon: Icons.queue_music,
               label: 'Play next',

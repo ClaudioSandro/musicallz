@@ -10,6 +10,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'app/app.dart';
 import 'features/player/application/audio_handler.dart';
 import 'features/player/presentation/providers/audio_service_providers.dart';
+import 'features/playlists/data/datasources/isar_database.dart';
+import 'features/playlists/presentation/providers/playlist_providers.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,11 +23,15 @@ Future<void> main() async {
 
   final audioHandler = await _initAudioHandler(audioPlayer);
 
+  // Persistent library (playlists + favorites) opened before the UI builds.
+  final isar = await IsarDatabase.getInstance();
+
   runApp(
     ProviderScope(
       overrides: [
         audioPlayerProvider.overrideWithValue(audioPlayer),
         audioHandlerProvider.overrideWithValue(audioHandler),
+        isarProvider.overrideWithValue(isar),
       ],
       child: const MusicallzApp(),
     ),

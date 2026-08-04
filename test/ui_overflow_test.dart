@@ -14,7 +14,10 @@ import 'package:musicallz/features/library/presentation/widgets/artist_tile.dart
 import 'package:musicallz/features/player/domain/models/player_state.dart';
 import 'package:musicallz/features/player/presentation/providers/player_providers.dart';
 import 'package:musicallz/features/player/presentation/screens/now_playing_screen.dart';
+import 'package:musicallz/features/playlists/presentation/providers/playlist_providers.dart';
 import 'package:musicallz/shared/widgets/marquee_text.dart';
+
+import 'helpers.dart';
 
 const _long = 'This is an extremely long song or album title used to check '
     'that no render overflow happens on narrow screens, it keeps going and '
@@ -43,6 +46,10 @@ Widget _app() => ProviderScope(
         musicRepositoryProvider.overrideWithValue(_LongTitleRepository()),
         libraryPermissionProvider
             .overrideWith((ref) async => PermissionStatus.granted),
+        playlistRepositoryProvider
+            .overrideWithValue(InMemoryPlaylistRepository()),
+        favoritesRepositoryProvider
+            .overrideWithValue(InMemoryFavoritesRepository()),
       ],
       child: const MusicallzApp(),
     );
@@ -162,6 +169,8 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          favoritesRepositoryProvider
+              .overrideWithValue(InMemoryFavoritesRepository()),
           currentSongProvider.overrideWithValue(song),
           isPlayingProvider.overrideWithValue(true),
           currentPositionProvider.overrideWithValue(Duration.zero),

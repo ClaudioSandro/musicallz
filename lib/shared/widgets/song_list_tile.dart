@@ -7,6 +7,7 @@ import '../../features/library/domain/entities/song.dart';
 import '../../features/library/presentation/widgets/cover_art.dart';
 import '../../features/player/presentation/providers/player_providers.dart';
 import 'equalizer_bars.dart';
+import 'favorite_button.dart';
 import 'song_context_menu.dart';
 
 /// A single song row used across list screens.
@@ -76,6 +77,8 @@ class SongListTile extends ConsumerWidget {
               ),
             ),
             const SizedBox(width: 4),
+            FavoriteButton(songId: song.id, size: 20),
+            const SizedBox(width: 2),
             IconButton(
               onPressed: () => openSongContextMenu(
                 context,

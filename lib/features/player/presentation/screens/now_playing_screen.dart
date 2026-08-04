@@ -13,6 +13,7 @@ import '../../../library/presentation/widgets/cover_art.dart';
 import '../../domain/models/player_state.dart';
 import '../../../../shared/widgets/marquee_text.dart';
 import '../../../../shared/widgets/seek_bar.dart';
+import '../../../../shared/widgets/favorite_button.dart';
 import '../providers/player_providers.dart';
 
 class NowPlayingScreen extends ConsumerStatefulWidget {
@@ -285,11 +286,12 @@ class _NowPlayingScreenState extends ConsumerState<NowPlayingScreen> {
   }
 }
 
-class _TopBar extends StatelessWidget {
+class _TopBar extends ConsumerWidget {
   const _TopBar();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final song = ref.watch(currentSongProvider);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: Row(
@@ -312,7 +314,10 @@ class _TopBar extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 48),
+          if (song != null)
+            FavoriteButton(songId: song.id, size: 24)
+          else
+            const SizedBox(width: 48),
         ],
       ),
     );

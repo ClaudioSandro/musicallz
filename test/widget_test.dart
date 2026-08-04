@@ -8,6 +8,9 @@ import 'package:musicallz/features/library/domain/entities/song.dart';
 import 'package:musicallz/features/library/domain/repositories/music_repository.dart';
 import 'package:musicallz/features/library/presentation/providers/library_permission_provider.dart';
 import 'package:musicallz/features/library/presentation/providers/music_repository_provider.dart';
+import 'package:musicallz/features/playlists/presentation/providers/playlist_providers.dart';
+
+import 'helpers.dart';
 
 class _FakeMusicRepository implements MusicRepository {
   @override
@@ -36,6 +39,10 @@ Widget _app() => ProviderScope(
         musicRepositoryProvider.overrideWithValue(_FakeMusicRepository()),
         libraryPermissionProvider
             .overrideWith((ref) async => PermissionStatus.granted),
+        playlistRepositoryProvider
+            .overrideWithValue(InMemoryPlaylistRepository()),
+        favoritesRepositoryProvider
+            .overrideWithValue(InMemoryFavoritesRepository()),
       ],
       child: const MusicallzApp(),
     );

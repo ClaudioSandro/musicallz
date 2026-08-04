@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_colors.dart';
+import '../../../../shared/widgets/favorite_button.dart';
 import '../../../../shared/widgets/marquee_text.dart';
 import '../../../library/presentation/widgets/cover_art.dart';
 import '../providers/player_providers.dart';
@@ -83,6 +84,7 @@ class MiniPlayer extends ConsumerWidget {
                       ],
                     ),
                   ),
+                  FavoriteButton(songId: song.id, size: 22),
                   _PlayPauseButton(),
                   _NextButton(),
                 ],

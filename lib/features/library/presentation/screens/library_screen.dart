@@ -5,6 +5,9 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/utils/app_gaps.dart';
 import '../../../../features/player/presentation/providers/player_providers.dart';
+import '../../../../features/playlists/presentation/providers/playlist_providers.dart';
+import '../../../../features/playlists/presentation/widgets/playlist_dialog.dart';
+import '../../../../features/playlists/presentation/widgets/playlist_tile.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/error_state.dart';
 import '../../../../shared/widgets/loading_state.dart';
@@ -141,16 +144,125 @@ class _LibraryTabBar extends StatelessWidget {
   }
 }
 
-class _PlaylistsView extends StatelessWidget {
+class _PlaylistsView extends ConsumerWidget {
   const _PlaylistsView();
 
   @override
-  Widget build(BuildContext context) {
-    return const EmptyState(
-      icon: Icons.queue_music,
-      title: 'Playlists',
-      message: 'Playlists will be available in the next phase.',
-    );
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final favoritesRepo = ref.read(playlistRepositoryProvider);
+
+    return ref.watch(playlistsProvider).when(
+          skipLoadingOnRefresh: true,
+          loading: () => const LoadingState(message: 'Loading playlists...'),
+          error: (error, _) => ErrorState(
+            message: '$error',
+            onRetry: () => ref.invalidate(playlistsProvider),
+          ),
+          data: (playlists) {
+            final likedCount =
+                ref.watch(favoriteSongIdsProvider).valueOrNull?.length ?? 0;
+            return ListView(
+              padding:
+                  const EdgeInsets.only(bottom: AppDimens.pagePadding),
+              children: [
+                LibraryTabHeader(
+                  title: 'Playlists',
+                  count: playlists.length,
+                ),
+                ListTile(
+                  onTap: () async {
+                    final draft = await showPlaylistDialog(
+                      context,
+                      title: 'New Playlist',
+                      confirmLabel: 'Create',
+                    );
+                    if (draft == null || !context.mounted) return;
+                    await favoritesRepo.createPlaylist(
+                      draft.name,
+                      description: draft.description.isEmpty
+                          ? null
+                          : draft.description,
+                    );
+                  },
+                  leading: Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surfaceContainerHigh,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.add,
+                      color: Colors.white,
+                    ),
+                  ),
+                  title: const Text(
+                    'Create Playlist',
+                    style: TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  subtitle: Text(
+                    'Start a fresh collection',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+                ListTile(
+                  onTap: () => context.push('/liked-songs'),
+                  leading: Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Color(0xFF7C4DFF),
+                          Color(0xFF9C27B0),
+                          Color(0xFF2979FF),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.favorite, color: Colors.white),
+                  ),
+                  title: const Text(
+                    'Liked Songs',
+                    style: TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  subtitle: Text(
+                    likedCount == 0
+                        ? 'Songs you like will appear here'
+                        : '$likedCount song${likedCount == 1 ? '' : 's'}',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+                if (playlists.isEmpty) ...[
+                  gap8,
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(
+                      'Your playlists will appear here.',
+                      style: TextStyle(color: Colors.white60),
+                    ),
+                  ),
+                ] else ...[
+                  gap8,
+                  ...playlists.map(
+                    (playlist) => PlaylistTile(
+                      playlist: playlist,
+                      onTap: () =>
+                          context.push('/playlist/${playlist.id}'),
+                    ),
+                  ),
+                ],
+              ],
+            );
+          },
+        );
   }
 }
 

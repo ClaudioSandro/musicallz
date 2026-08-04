@@ -6,7 +6,9 @@ import '../features/home/presentation/home_screen.dart';
 import '../features/library/presentation/screens/album_detail_screen.dart';
 import '../features/library/presentation/screens/artist_detail_screen.dart';
 import '../features/library/presentation/screens/library_screen.dart';
+import '../features/library/presentation/screens/liked_songs_screen.dart';
 import '../features/player/presentation/screens/now_playing_screen.dart';
+import '../features/playlists/presentation/screens/playlist_detail_screen.dart';
 import '../features/search/presentation/search_screen.dart';
 import '../features/settings/presentation/settings_screen.dart';
 
@@ -77,6 +79,18 @@ final appRouter = GoRouter(
       path: '/now-playing',
       name: 'now-playing',
       builder: (context, state) => const NowPlayingScreen(),
+    ),
+    GoRoute(
+      path: '/playlist/:playlistId',
+      name: 'playlist',
+      builder: (context, state) => PlaylistDetailScreen(
+        playlistId: int.parse(state.pathParameters['playlistId']!),
+      ),
+    ),
+    GoRoute(
+      path: '/liked-songs',
+      name: 'liked-songs',
+      builder: (context, state) => const LikedSongsScreen(),
     ),
   ],
 );
