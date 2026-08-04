@@ -6,7 +6,6 @@ import '../../../../core/utils/app_gaps.dart';
 import '../../../../core/utils/format_duration.dart';
 import '../../../../features/player/presentation/providers/player_providers.dart';
 import '../../../../shared/widgets/empty_state.dart';
-import '../../../../shared/widgets/section_header.dart';
 import '../../../../shared/widgets/song_list_tile.dart';
 import '../../domain/entities/album.dart';
 import '../providers/library_index_provider.dart';
@@ -19,6 +18,7 @@ class AlbumDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final album = ref.watch(albumProvider(albumId));
     final songs = ref.watch(albumSongsProvider(albumId));
 
@@ -38,28 +38,57 @@ class AlbumDetailScreen extends ConsumerWidget {
       (acc, song) => acc + song.duration,
     );
 
+    final headerImage = CoverArt(bytes: album.coverArt, size: 200, radius: 16);
+
     return Scaffold(
-      appBar: AppBar(),
-      body: ListView(
-        padding: const EdgeInsets.only(bottom: AppDimens.pagePadding),
-        children: [
-          _AlbumHeader(
-            album: album,
-            totalDuration: totalDuration,
-            onPlay: () => ref.read(playerControllerProvider.notifier)
-                .playQueue(songs),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            pinned: true,
+            expandedHeight: 360,
+            backgroundColor: theme.colorScheme.surface,
+            surfaceTintColor: Colors.transparent,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            flexibleSpace: FlexibleSpaceBar(
+              background: _AlbumHeader(
+                album: album,
+                totalDuration: totalDuration,
+                onPlay: () => ref.read(playerControllerProvider.notifier)
+                    .playQueue(songs),
+                heroImage: headerImage,
+              ),
+            ),
           ),
-          gap8,
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: AppDimens.pagePadding),
-            child: SectionHeader(title: 'Songs'),
-          ),
-          gap8,
-          ...songs.map(
-            (song) => SongListTile(
-              song: song,
-              onTap: () => ref.read(playerControllerProvider.notifier)
-                  .playQueue(songs, startIndex: songs.indexOf(song)),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppDimens.pagePadding,
+                vertical: 16,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Songs',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  gap8,
+                  ...songs.map(
+                    (song) => SongListTile(
+                      song: song,
+                      queue: songs,
+                      onTap: () => ref.read(playerControllerProvider.notifier)
+                          .playQueue(songs,
+                              startIndex: songs.indexOf(song)),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -68,16 +97,19 @@ class AlbumDetailScreen extends ConsumerWidget {
   }
 }
 
+/// The detail header uses the full gradient overlay plus the cover art.
 class _AlbumHeader extends StatelessWidget {
   const _AlbumHeader({
     required this.album,
     required this.totalDuration,
     required this.onPlay,
+    required this.heroImage,
   });
 
   final Album album;
   final Duration totalDuration;
   final VoidCallback onPlay;
+  final Widget heroImage;
 
   @override
   Widget build(BuildContext context) {
@@ -88,52 +120,86 @@ class _AlbumHeader extends StatelessWidget {
       'Duración total ${formatDuration(totalDuration)}',
     ].join(' · ');
 
-    return Padding(
-      padding: const EdgeInsets.all(AppDimens.pagePadding),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CoverArt(bytes: album.coverArt, size: 120, radius: 12),
-          const SizedBox(width: 16),
-          Expanded(
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color.lerp(theme.colorScheme.primary, Colors.black, 0.55)!,
+                Colors.black.withValues(alpha: 0.35),
+              ],
+            ),
+          ),
+        ),
+        Align(
+          alignment: Alignment.topLeft,
+          // Scrollable so long titles / large text don't overflow the header.
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(AppDimens.pagePadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
+                heroImage,
+                gap16,
                 Text(
                   album.title,
-                  style: theme.textTheme.headlineSmall?.copyWith(
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.w800,
+                    color: Colors.white,
                   ),
                 ),
                 gap4,
                 Text(
                   album.artist,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w600,
+                    color: Colors.white,
                   ),
                 ),
                 gap4,
                 Text(
                   subtitle,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+                    color: Colors.white70,
                   ),
                 ),
-                gap12,
-                IconButton.filled(
-                  onPressed: onPlay,
-                  icon: const Icon(Icons.play_arrow, size: 28),
-                  tooltip: 'Play album',
-                  style: IconButton.styleFrom(
-                    backgroundColor: theme.colorScheme.primary,
-                    foregroundColor: Colors.black,
-                  ),
+                gap16,
+                Row(
+                  children: [
+                    IconButton.filled(
+                      onPressed: onPlay,
+                      icon: const Icon(Icons.play_arrow, size: 28),
+                      tooltip: 'Play album',
+                      style: IconButton.styleFrom(
+                        backgroundColor: theme.colorScheme.primary,
+                        foregroundColor: Colors.black,
+                      ),
+                    ),
+                    gap12,
+                    IconButton(
+                      onPressed: () {},
+                      icon: const Icon(Icons.favorite_border,
+                          color: Colors.white),
+                      tooltip: 'Save album',
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

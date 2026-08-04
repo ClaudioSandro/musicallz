@@ -86,21 +86,34 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   }
 }
 
-class _SearchField extends StatelessWidget {
+class _SearchField extends StatefulWidget {
   const _SearchField({required this.controller, required this.onChanged});
 
   final TextEditingController controller;
   final ValueChanged<String> onChanged;
 
   @override
+  State<_SearchField> createState() => _SearchFieldState();
+}
+
+class _SearchFieldState extends State<_SearchField> {
+  bool _focused = false;
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOut,
       height: 48,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: _focused ? AppColors.accent : Colors.transparent,
+          width: 1.5,
+        ),
       ),
       child: Row(
         children: [
@@ -108,10 +121,13 @@ class _SearchField extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: TextField(
-              controller: controller,
-              onChanged: onChanged,
+              controller: widget.controller,
+              onChanged: widget.onChanged,
               autofocus: false,
               textInputAction: TextInputAction.search,
+              onTap: () => setState(() => _focused = true),
+              onSubmitted: (_) => setState(() => _focused = false),
+              onEditingComplete: () => setState(() => _focused = false),
               decoration: InputDecoration(
                 border: InputBorder.none,
                 hintText: 'Qué quieres escuchar?',
@@ -122,12 +138,13 @@ class _SearchField extends StatelessWidget {
               ),
             ),
           ),
-          if (controller.text.isNotEmpty)
+          if (widget.controller.text.isNotEmpty)
             IconButton(
               icon: const Icon(Icons.close),
               onPressed: () {
-                controller.clear();
-                onChanged('');
+                widget.controller.clear();
+                widget.onChanged('');
+                setState(() => _focused = false);
               },
             ),
         ],

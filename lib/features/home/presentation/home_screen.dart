@@ -14,8 +14,8 @@ import '../../../features/library/presentation/widgets/horizontal_artist_card.da
 import '../../../features/player/presentation/providers/player_providers.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/error_state.dart';
-import '../../../shared/widgets/loading_state.dart';
 import '../../../shared/widgets/section_header.dart';
+import '../../../shared/widgets/skeleton_loading.dart';
 import '../../../shared/widgets/song_list_tile.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -24,6 +24,13 @@ class HomeScreen extends ConsumerWidget {
   static const int _recentLimit = 5;
   static const int _topArtistsLimit = 6;
   static const int _albumsLimit = 6;
+
+  String _greeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'Buenos días';
+    if (hour < 19) return 'Buenas tardes';
+    return 'Buenas noches';
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -45,15 +52,23 @@ class HomeScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Musicallz',
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.accent,
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Musicallz',
+                          style: theme.textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.accent,
+                          ),
+                        ),
+                      ),
+                      _Avatar(),
+                    ],
                   ),
+                  gap8,
                   Text(
-                    'Bienvenido, tu música local te espera.',
+                    '${_greeting()}, tu música local te espera.',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: AppColors.textSecondary,
                     ),
@@ -66,8 +81,7 @@ class HomeScreen extends ConsumerWidget {
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 400),
                 child: library.when(
-                  loading: () =>
-                      const LoadingState(message: 'Scanning your music...'),
+                  loading: () => const _HomeSkeleton(),
                   error: (error, stackTrace) => ErrorState(
                     message: describeLibraryError(error),
                     onRetry: () =>
@@ -80,13 +94,55 @@ class HomeScreen extends ConsumerWidget {
                           message: 'Create the folder Music/MusicallzStorage '
                               'and place MP3 files inside it.',
                         )
-                      : _HomeContent(songs: songs),
+                      : RefreshIndicator(
+                          onRefresh: () =>
+                              ref.read(musicLibraryProvider.notifier).refresh(),
+                          child: _HomeContent(songs: songs),
+                        ),
                 ),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _Avatar extends StatelessWidget {
+  const _Avatar();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 36,
+      height: 36,
+      decoration: BoxDecoration(
+        color: AppColors.surfaceHigh,
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.white24),
+      ),
+      child: const Icon(Icons.person_outline, color: Colors.white, size: 20),
+    );
+  }
+}
+
+class _HomeSkeleton extends StatelessWidget {
+  const _HomeSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.symmetric(horizontal: AppDimens.pagePadding),
+      physics: const NeverScrollableScrollPhysics(),
+      children: const [
+        SkeletonBox(width: 160, height: 20),
+        SizedBox(height: 16),
+        SkeletonSongTile(),
+        SkeletonSongTile(),
+        SkeletonSongTile(),
+        SkeletonSongTile(),
+      ],
     );
   }
 }
@@ -105,10 +161,28 @@ class _HomeContent extends ConsumerWidget {
 
     final artists = ref.watch(artistsProvider);
     final albums = ref.watch(albumsProvider);
+    final currentSong = ref.watch(currentSongProvider);
+    final hasActive = ref.watch(hasActiveSongProvider);
 
     return ListView(
       padding: const EdgeInsets.only(bottom: AppDimens.pagePadding),
       children: [
+        if (hasActive && currentSong != null) ...[
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: AppDimens.pagePadding),
+            child: SectionHeader(
+              title: 'Continue Listening',
+              subtitle: 'EN CURSO',
+            ),
+          ),
+          gap8,
+          SongListTile(
+            song: currentSong,
+            queue: ref.watch(queueProvider),
+            onTap: () => context.push('/now-playing'),
+          ),
+          gap24,
+        ],
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: AppDimens.pagePadding),
           child: SectionHeader(title: 'Recently Added'),
@@ -117,6 +191,7 @@ class _HomeContent extends ConsumerWidget {
         ...recent.map(
           (song) => SongListTile(
             song: song,
+            queue: songs,
             onTap: () => ref.read(playerControllerProvider.notifier)
                 .playQueue(songs, startIndex: songs.indexOf(song)),
           ),

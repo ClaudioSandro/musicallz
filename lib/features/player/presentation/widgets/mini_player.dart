@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_colors.dart';
-import '../../../../core/utils/app_gaps.dart';
-import '../../../library/domain/entities/song.dart';
+import '../../../../shared/widgets/marquee_text.dart';
 import '../../../library/presentation/widgets/cover_art.dart';
 import '../providers/player_providers.dart';
 
@@ -13,59 +13,82 @@ class MiniPlayer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
     final song = ref.watch(currentSongProvider);
     final hasSong = ref.watch(hasActiveSongProvider);
 
     if (!hasSong || song == null) return const SizedBox.shrink();
 
+    final position = ref.watch(currentPositionProvider);
+    final duration = ref.watch(totalDurationProvider);
+    final fraction = duration > Duration.zero
+        ? (position.inMilliseconds / duration.inMilliseconds).clamp(0.0, 1.0)
+        : 0.0;
+
     return Material(
       color: AppColors.surface,
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () => context.push('/now-playing'),
-        child: Container(
-          height: 64,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: const BoxDecoration(
-            color: AppColors.surface,
-            border: Border(top: BorderSide(color: AppColors.surfaceHigh)),
-          ),
-          child: Row(
-            children: [
-              CoverArt(
-                bytes: song.albumArt,
-                size: 44,
-                radius: 6,
+        child: Column(
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              height: 2,
+              width: double.infinity,
+              color: AppColors.surfaceHigh,
+              alignment: Alignment.centerLeft,
+              child: FractionallySizedBox(
+                widthFactor: fraction,
+                child: const ColoredBox(color: AppColors.accent),
               ),
-              gap12,
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      song.title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Text(
-                      song.artist,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
+            ),
+            Container(
+              height: 62,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: const BoxDecoration(
+                color: AppColors.surface,
               ),
-              _PlayPauseButton(song: song),
-              _NextButton(),
-            ],
-          ),
+              child: Row(
+                children: [
+                  Hero(
+                    tag: 'song-art-${song.id}',
+                    child: CoverArt(
+                      bytes: song.albumArt,
+                      size: 44,
+                      radius: 6,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        MarqueeText(
+                          song.title,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.copyWith(fontWeight: FontWeight.w600),
+                        ),
+                        Text(
+                          song.artist,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(color: AppColors.textSecondary),
+                        ),
+                      ],
+                    ),
+                  ),
+                  _PlayPauseButton(),
+                  _NextButton(),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -73,16 +96,17 @@ class MiniPlayer extends ConsumerWidget {
 }
 
 class _PlayPauseButton extends ConsumerWidget {
-  const _PlayPauseButton({required this.song});
-
-  final Song song;
+  const _PlayPauseButton();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final playing = ref.watch(isPlayingProvider);
+    final ctrl = ref.read(playerControllerProvider.notifier);
     return IconButton(
-      onPressed: () =>
-          ref.read(playerControllerProvider.notifier).togglePlayPause(),
+      onPressed: () {
+        HapticFeedback.selectionClick();
+        ctrl.togglePlayPause();
+      },
       icon: Icon(
         playing ? Icons.pause_circle_filled : Icons.play_circle_filled,
         color: Colors.white,

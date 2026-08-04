@@ -1,12 +1,18 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_colors.dart';
-import '../../../../core/utils/app_gaps.dart';
+import '../../../../core/utils/color_utils.dart';
 import '../../../../core/utils/format_duration.dart';
+import '../../../library/domain/entities/song.dart';
 import '../../../library/presentation/widgets/cover_art.dart';
 import '../../domain/models/player_state.dart';
+import '../../../../shared/widgets/marquee_text.dart';
+import '../../../../shared/widgets/seek_bar.dart';
 import '../providers/player_providers.dart';
 
 class NowPlayingScreen extends ConsumerStatefulWidget {
@@ -18,10 +24,45 @@ class NowPlayingScreen extends ConsumerStatefulWidget {
 
 class _NowPlayingScreenState extends ConsumerState<NowPlayingScreen> {
   double? _dragMs;
+  Color _baseColor = AppColors.surfaceHigh;
+  Timer? _colorDebounce;
+
+  @override
+  void initState() {
+    super.initState();
+    final song = ref.read(currentSongProvider);
+    if (song != null) _scheduleColorExtract(song);
+  }
+
+  @override
+  void dispose() {
+    _colorDebounce?.cancel();
+    super.dispose();
+  }
+
+  void _scheduleColorExtract(Song song) {
+    _colorDebounce?.cancel();
+    final bytes = song.albumArt;
+    if (bytes == null) {
+      setState(() => _baseColor = AppColors.surfaceHigh);
+      return;
+    }
+    _colorDebounce = Timer(const Duration(milliseconds: 250), () async {
+      final color = await extractDominantColor(bytes);
+      if (mounted && ref.read(currentSongProvider)?.id == song.id) {
+        setState(() => _baseColor = color ?? AppColors.surfaceHigh);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    ref.listen<Song?>(currentSongProvider, (previous, next) {
+      if (next != null && next.id != previous?.id) {
+        _scheduleColorExtract(next);
+      }
+    });
+
     final song = ref.watch(currentSongProvider);
     final playing = ref.watch(isPlayingProvider);
     final position = ref.watch(currentPositionProvider);
@@ -29,163 +70,284 @@ class _NowPlayingScreenState extends ConsumerState<NowPlayingScreen> {
     final shuffle = ref.watch(shuffleStateProvider);
     final repeat = ref.watch(repeatStateProvider);
 
-    final displayMs = (_dragMs ?? position.inMilliseconds.toDouble())
-        .clamp(0.0, duration.inMilliseconds.toDouble())
-        .toDouble();
+    final maxMs = duration.inMilliseconds.toDouble().clamp(1, double.infinity);
+    final displayMs =
+        (_dragMs ?? position.inMilliseconds.toDouble()).clamp(0.0, maxMs);
     final displayPos = Duration(milliseconds: displayMs.round());
+    final remaining = duration - displayPos;
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => context.pop(),
-                    icon: const Icon(Icons.keyboard_arrow_down,
-                        color: AppColors.textSecondary),
-                  ),
-                  const Expanded(
-                    child: Text(
-                      'Musicallz',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 48),
-                ],
-              ),
+      body: GestureDetector(
+        onVerticalDragEnd: (details) {
+          if (details.primaryVelocity != null &&
+              details.primaryVelocity! > 500) {
+            context.pop();
+          }
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 900),
+          curve: Curves.easeOutCubic,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color.lerp(_baseColor, Colors.black, 0.72)!,
+                Color.lerp(_baseColor, Colors.black, 0.92)!,
+              ],
             ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 300),
-                      child: KeyedSubtree(
-                        key: ValueKey(song?.id ?? 'none'),
-                        child: CoverArt(
-                          bytes: song?.albumArt,
-                          size: 340,
-                          radius: 28,
-                        ),
-                      ),
-                    ),
-                    const Spacer(),
-                    _TitleBlock(
-                      key: ValueKey(song?.id ?? 'none'),
-                      title: song?.title ?? '',
-                      artist: song?.artist ?? '',
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                children: [
-                  Slider(
-                    value: displayMs,
-                    max: duration.inMilliseconds.toDouble().clamp(1, double.infinity).toDouble(),
-                    activeColor: AppColors.accent,
-                    inactiveColor: AppColors.surfaceHigh,
-                    onChangeStart: (_) => setState(() => _dragMs = displayMs),
-                    onChanged: (v) => setState(() => _dragMs = v),
-                    onChangeEnd: (v) {
-                      ref
-                          .read(playerControllerProvider.notifier)
-                          .seekTo(Duration(milliseconds: v.round()));
-                      setState(() => _dragMs = null);
+          ),
+          child: SafeArea(
+            child: Column(
+              children: [
+                _TopBar(),
+                Expanded(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onHorizontalDragEnd: (details) {
+                      final ctrl =
+                          ref.read(playerControllerProvider.notifier);
+                      if (details.primaryVelocity != null) {
+                        if (details.primaryVelocity! < -300) {
+                          HapticFeedback.lightImpact();
+                          ctrl.next();
+                        } else if (details.primaryVelocity! > 300) {
+                          HapticFeedback.lightImpact();
+                          ctrl.previous();
+                        }
+                      }
                     },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 40),
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          // The middle area is a fixed-size stack (cover + gap +
+                          // title block) that would overflow on short screens.
+                          // Compute the cover size from the available height so
+                          // everything always fits without a scrollable.
+                          const gap = 40.0;
+                          const titleHeight = 96.0;
+                          final coverSize =
+                              (constraints.maxHeight - gap - titleHeight)
+                                  .clamp(80.0, 300.0);
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 300),
+                                transitionBuilder: (child, animation) =>
+                                    FadeTransition(
+                                  opacity: animation,
+                                  child: ScaleTransition(
+                                    scale: Tween(begin: 0.94, end: 1.0)
+                                        .animate(animation),
+                                    child: child,
+                                  ),
+                                ),
+                                child: Hero(
+                                  key: ValueKey('hero-${song?.id ?? 'none'}'),
+                                  tag: 'song-art-${song?.id ?? 'none'}',
+                                  child: CoverArt(
+                                    bytes: song?.albumArt,
+                                    size: coverSize,
+                                    radius: 24,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 40),
+                              _TitleBlock(
+                                key: ValueKey('title-${song?.id ?? 'none'}'),
+                                title: song?.title ?? '',
+                                artist: song?.artist ?? '',
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 28),
+                  child: Column(
                     children: [
-                      Text(
-                        formatDuration(displayPos),
-                        style: theme.textTheme.labelMedium?.copyWith(
-                          color: AppColors.textSecondary,
+                      SeekBar(
+                        position: displayPos,
+                        duration: duration,
+                        onChangeEnd: (value) {
+                          HapticFeedback.selectionClick();
+                          ref
+                              .read(playerControllerProvider.notifier)
+                              .seekTo(value);
+                          setState(() => _dragMs = null);
+                        },
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            formatDuration(displayPos),
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                          Text(
+                            formatDuration(remaining),
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _ControlButton(
+                                icon: Icons.shuffle,
+                                size: 20,
+                                color: shuffle
+                                    ? AppColors.accent
+                                    : AppColors.textSecondary,
+                                onTap: () => ref
+                                    .read(playerControllerProvider.notifier)
+                                    .toggleShuffle(),
+                                tooltip: 'Shuffle',
+                                boxSize: 38,
+                              ),
+                              const SizedBox(width: 6),
+                              _ControlButton(
+                                icon: Icons.skip_previous_rounded,
+                                size: 30,
+                                onTap: () => ref
+                                    .read(playerControllerProvider.notifier)
+                                    .previous(),
+                                tooltip: 'Previous',
+                                boxSize: 44,
+                              ),
+                              const SizedBox(width: 6),
+                              _ControlButton(
+                                icon: Icons.replay_10,
+                                size: 22,
+                                color: Colors.white.withValues(alpha: 0.9),
+                                onTap: () => ref
+                                    .read(playerControllerProvider.notifier)
+                                    .seekBackward(),
+                                tooltip: 'Back 10 seconds',
+                                boxSize: 38,
+                              ),
+                              const SizedBox(width: 6),
+                              _PlayPauseButton(playing: playing),
+                              const SizedBox(width: 6),
+                              _ControlButton(
+                                icon: Icons.forward_10,
+                                size: 22,
+                                color: Colors.white.withValues(alpha: 0.9),
+                                onTap: () => ref
+                                    .read(playerControllerProvider.notifier)
+                                    .seekForward(),
+                                tooltip: 'Forward 10 seconds',
+                                boxSize: 38,
+                              ),
+                              const SizedBox(width: 6),
+                              _ControlButton(
+                                icon: Icons.skip_next_rounded,
+                                size: 30,
+                                onTap: () => ref
+                                    .read(playerControllerProvider.notifier)
+                                    .next(),
+                                tooltip: 'Next',
+                                boxSize: 44,
+                              ),
+                              const SizedBox(width: 6),
+                              _RepeatButton(mode: repeat),
+                            ],
+                          ),
                         ),
                       ),
-                      Text(
-                        '-${formatDuration(duration - displayPos > Duration.zero ? duration - displayPos : Duration.zero)}',
-                        style: theme.textTheme.labelMedium?.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
+                      const SizedBox(height: 24),
                     ],
                   ),
-                  gap16,
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _ShuffleButton(enabled: shuffle),
-                      _SkipButton(
-                        icon: Icons.skip_previous,
-                        isPrevious: true,
-                      ),
-                      _PlayPauseButton(playing: playing),
-                      _SkipButton(
-                        icon: Icons.skip_next,
-                        isPrevious: false,
-                      ),
-                      _RepeatButton(mode: repeat),
-                    ],
-                  ),
-                  gap24,
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 }
 
+class _TopBar extends StatelessWidget {
+  const _TopBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      child: Row(
+        children: [
+          IconButton(
+            onPressed: () => context.pop(),
+            icon: const Icon(Icons.keyboard_arrow_down,
+                color: Colors.white, size: 32),
+            tooltip: 'Collapse',
+          ),
+          const Expanded(
+            child: Text(
+              'NOW PLAYING',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 2,
+              ),
+            ),
+          ),
+          const SizedBox(width: 48),
+        ],
+      ),
+    );
+  }
+}
+
 class _TitleBlock extends StatelessWidget {
-  const _TitleBlock({
-    super.key,
-    required this.title,
-    required this.artist,
-  });
+  const _TitleBlock({super.key, required this.title, required this.artist});
 
   final String title;
   final String artist;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return SizedBox(
-      height: 100,
+      height: 96,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
+          MarqueeText(
             title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.titleLarge?.copyWith(
+            style: const TextStyle(
+              fontSize: 22,
               fontWeight: FontWeight.w800,
               color: Colors.white,
             ),
           ),
-          gap4,
+          const SizedBox(height: 8),
           Text(
             artist,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.bodyLarge?.copyWith(
+            style: const TextStyle(
+              fontSize: 15,
               color: AppColors.textSecondary,
             ),
           ),
@@ -195,62 +357,39 @@ class _TitleBlock extends StatelessWidget {
   }
 }
 
-class _ShuffleButton extends ConsumerWidget {
-  const _ShuffleButton({required this.enabled});
-
-  final bool enabled;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final color = enabled ? AppColors.accent : AppColors.textSecondary;
-    return IconButton(
-      onPressed: () =>
-          ref.read(playerControllerProvider.notifier).toggleShuffle(),
-      icon: Icon(Icons.shuffle, color: color, size: 26),
-      tooltip: 'Shuffle',
-    );
-  }
-}
-
-class _SkipButton extends ConsumerWidget {
-  const _SkipButton({required this.icon, required this.isPrevious});
+class _ControlButton extends StatelessWidget {
+  const _ControlButton({
+    required this.icon,
+    required this.size,
+    required this.onTap,
+    required this.tooltip,
+    this.color = Colors.white,
+    this.boxSize = 40,
+  });
 
   final IconData icon;
-  final bool isPrevious;
+  final double size;
+  final VoidCallback onTap;
+  final String tooltip;
+  final Color color;
+  final double boxSize;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return IconButton(
-      onPressed: () {
-        final ctrl = ref.read(playerControllerProvider.notifier);
-        if (isPrevious) {
-          ctrl.previous();
-        } else {
-          ctrl.next();
-        }
-      },
-      icon: Icon(icon, color: Colors.white, size: 30),
-      tooltip: isPrevious ? 'Previous' : 'Next',
-    );
-  }
-}
-
-class _PlayPauseButton extends ConsumerWidget {
-  const _PlayPauseButton({required this.playing});
-
-  final bool playing;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return IconButton(
-      onPressed: () =>
-          ref.read(playerControllerProvider.notifier).togglePlayPause(),
-      icon: Icon(
-        playing ? Icons.pause_circle_filled : Icons.play_circle_filled,
-        color: Colors.white,
-        size: 72,
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: InkResponse(
+        onTap: () {
+          HapticFeedback.selectionClick();
+          onTap();
+        },
+        radius: boxSize * 0.5,
+        child: SizedBox(
+          width: boxSize,
+          height: boxSize,
+          child: Icon(icon, size: size, color: color),
+        ),
       ),
-      tooltip: playing ? 'Pause' : 'Play',
     );
   }
 }
@@ -262,26 +401,84 @@ class _RepeatButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final color = mode == RepeatMode.off ? AppColors.textSecondary : AppColors.accent;
-    return IconButton(
-      onPressed: () => ref.read(playerControllerProvider.notifier).cycleRepeat(),
-      icon: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Icon(
-            mode == RepeatMode.one ? Icons.repeat_one : Icons.repeat,
-            color: color,
-            size: 26,
+    final color = mode == RepeatMode.off
+        ? AppColors.textSecondary
+        : AppColors.accent;
+    return Tooltip(
+      message: 'Repeat',
+      child: InkResponse(
+        onTap: () {
+          HapticFeedback.selectionClick();
+          ref.read(playerControllerProvider.notifier).cycleRepeat();
+        },
+        radius: 19,
+        child: SizedBox(
+          width: 38,
+          height: 38,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Positioned(
+                left: 8,
+                top: 9,
+                child: Icon(
+                  mode == RepeatMode.one ? Icons.repeat_one : Icons.repeat,
+                  color: color,
+                  size: 20,
+                ),
+              ),
+              if (mode == RepeatMode.all)
+                const Positioned(
+                  right: 4,
+                  top: 2,
+                  child: Icon(Icons.circle, size: 6, color: AppColors.accent),
+                ),
+            ],
           ),
-          if (mode == RepeatMode.all)
-            const Positioned(
-              right: 0,
-              top: 0,
-              child: Icon(Icons.circle, size: 8, color: AppColors.accent),
-            ),
-        ],
+        ),
       ),
-      tooltip: 'Repeat',
+    );
+  }
+}
+
+class _PlayPauseButton extends ConsumerWidget {
+  const _PlayPauseButton({required this.playing});
+
+  final bool playing;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Tooltip(
+      message: playing ? 'Pause' : 'Play',
+      child: InkResponse(
+        onTap: () {
+          HapticFeedback.mediumImpact();
+          ref.read(playerControllerProvider.notifier).togglePlayPause();
+        },
+        radius: 30,
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 250),
+          transitionBuilder: (child, animation) => ScaleTransition(
+            scale: animation,
+            child: FadeTransition(opacity: animation, child: child),
+          ),
+          child: Container(
+            key: ValueKey(playing),
+            width: 60,
+            height: 60,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
+              key: ValueKey('playicon-$playing'),
+              color: Colors.black,
+              size: 34,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
