@@ -55,6 +55,7 @@ class MiniPlayer extends ConsumerWidget {
                     tag: 'song-art-${song.id}',
                     child: CoverArt(
                       bytes: song.albumArt,
+                      filePath: song.albumArtPath,
                       size: 44,
                       radius: 6,
                     ),

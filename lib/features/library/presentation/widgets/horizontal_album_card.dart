@@ -20,7 +20,12 @@ class HorizontalAlbumCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CoverArt(bytes: album.coverArt, size: 124, radius: 8),
+            CoverArt(
+              bytes: album.coverArt,
+              filePath: album.coverArtPath,
+              size: 124,
+              radius: 8,
+            ),
             const SizedBox(height: 8),
             Text(
               album.title,

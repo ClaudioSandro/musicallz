@@ -24,6 +24,10 @@ class MethodChannelMediaMetadataReader implements MediaMetadataReader {
       trackNumber: (result?['track'] as num?)?.toInt(),
       year: (result?['year'] as num?)?.toInt(),
       albumArt: result?['albumArt'] as Uint8List?,
+      genre: result?['genre'] as String?,
+      composer: result?['composer'] as String?,
+      albumArtist: result?['albumArtist'] as String?,
+      discNumber: (result?['discNumber'] as num?)?.toInt(),
     );
   }
 }

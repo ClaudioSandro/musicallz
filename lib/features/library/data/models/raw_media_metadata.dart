@@ -9,6 +9,10 @@ class RawMediaMetadata {
     this.trackNumber,
     this.year,
     this.albumArt,
+    this.genre,
+    this.composer,
+    this.albumArtist,
+    this.discNumber,
   });
 
   final String? title;
@@ -18,4 +22,8 @@ class RawMediaMetadata {
   final int? trackNumber;
   final int? year;
   final Uint8List? albumArt;
+  final String? genre;
+  final String? composer;
+  final String? albumArtist;
+  final int? discNumber;
 }

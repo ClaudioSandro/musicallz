@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -44,12 +45,25 @@ class _NowPlayingScreenState extends ConsumerState<NowPlayingScreen> {
   void _scheduleColorExtract(Song song) {
     _colorDebounce?.cancel();
     final bytes = song.albumArt;
-    if (bytes == null) {
+    final path = song.albumArtPath;
+    if (bytes == null && path == null) {
       setState(() => _baseColor = AppColors.surfaceHigh);
       return;
     }
     _colorDebounce = Timer(const Duration(milliseconds: 250), () async {
-      final color = await extractDominantColor(bytes);
+      Uint8List? data = bytes;
+      if (data == null && path != null) {
+        try {
+          data = await File(path).readAsBytes();
+        } on Exception {
+          data = null;
+        }
+      }
+      if (data == null) {
+        if (mounted) setState(() => _baseColor = AppColors.surfaceHigh);
+        return;
+      }
+      final color = await extractDominantColor(data);
       if (mounted && ref.read(currentSongProvider)?.id == song.id) {
         setState(() => _baseColor = color ?? AppColors.surfaceHigh);
       }
@@ -151,6 +165,7 @@ class _NowPlayingScreenState extends ConsumerState<NowPlayingScreen> {
                                   tag: 'song-art-${song?.id ?? 'none'}',
                                   child: CoverArt(
                                     bytes: song?.albumArt,
+                                    filePath: song?.albumArtPath,
                                     size: coverSize,
                                     radius: 24,
                                   ),
@@ -314,9 +329,15 @@ class _TopBar extends ConsumerWidget {
               ),
             ),
           ),
-          if (song != null)
-            FavoriteButton(songId: song.id, size: 24)
-          else
+          if (song != null) ...[
+            IconButton(
+              onPressed: () => context.push('/queue'),
+              icon: const Icon(Icons.queue_music, color: Colors.white70, size: 22),
+              tooltip: 'Queue',
+            ),
+            const SizedBox(width: 4),
+            FavoriteButton(songId: song.id, size: 24),
+          ] else
             const SizedBox(width: 48),
         ],
       ),

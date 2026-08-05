@@ -153,11 +153,32 @@ class _SearchFieldState extends State<_SearchField> {
   }
 }
 
-class _BrowseGrid extends StatelessWidget {
+class _BrowseGrid extends ConsumerWidget {
   const _BrowseGrid();
 
+  static const _palette = [
+    Color(0xFFE13300),
+    Color(0xFF8D67AB),
+    Color(0xFF148A08),
+    Color(0xFF1E3264),
+    Color(0xFFE8115B),
+    Color(0xFF008A5B),
+    Color(0xFF7358FF),
+    Color(0xFF503750),
+    Color(0xFFBA5D07),
+    Color(0xFFD84000),
+    Color(0xFF0D73EC),
+    Color(0xFF777777),
+  ];
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final genres =
+        ref.watch(libraryIndexProvider)?.genres ?? const <String>[];
+    // Genres are hidden until the library has at least three of them.
+    if (genres.length < 3) {
+      return const SizedBox.shrink();
+    }
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: AppDimens.pagePadding),
       children: [
@@ -170,11 +191,15 @@ class _BrowseGrid extends StatelessWidget {
           mainAxisSpacing: 12,
           crossAxisSpacing: 12,
           childAspectRatio: 1.4,
-          children: const [
-            _GenreCard(label: 'Pop', color: Color(0xFFE13300)),
-            _GenreCard(label: 'Rock', color: Color(0xFF8D67AB)),
-            _GenreCard(label: 'Lofi', color: Color(0xFF148A08)),
-            _GenreCard(label: 'Electrónica', color: Color(0xFF1E3264)),
+          children: [
+            for (final genre in genres)
+              _GenreCard(
+                label: genre,
+                color: _palette[genre.hashCode.abs() % _palette.length],
+                onTap: () => context.push(
+                  '/genre/${Uri.encodeComponent(genre)}',
+                ),
+              ),
           ],
         ),
       ],
@@ -199,78 +224,99 @@ class _SearchResults extends ConsumerWidget {
       );
     }
 
-    return ListView(
+    final songsLen = results.songs.length;
+    final artistsLen = results.artists.length;
+    final albumsLen = results.albums.length;
+
+    Widget? section(bool has, String title) => has
+        ? Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: AppDimens.pagePadding),
+            child: SectionHeader(title: title),
+          )
+        : null;
+
+    final songsHeader = section(songsLen > 0, 'Canciones');
+    final artistsHeader = section(artistsLen > 0, 'Artistas');
+    final albumsHeader = section(albumsLen > 0, 'Álbumes');
+
+    final total = (songsLen > 0 ? 1 + songsLen : 0) +
+        (artistsLen > 0 ? 1 + artistsLen : 0) +
+        (albumsLen > 0 ? 1 + albumsLen : 0);
+
+    return ListView.builder(
       padding: const EdgeInsets.only(bottom: AppDimens.pagePadding),
-      children: [
-        if (results.songs.isNotEmpty) ...[
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: AppDimens.pagePadding),
-            child: SectionHeader(title: 'Canciones'),
-          ),
-          gap8,
-          ...results.songs.map(
-            (song) => SongListTile(
+      itemCount: total,
+      itemBuilder: (context, index) {
+        if (songsLen > 0) {
+          if (index == 0) return songsHeader!;
+          if (index < 1 + songsLen) {
+            final song = results.songs[index - 1];
+            return SongListTile(
               song: song,
               onTap: () => ref.read(playerControllerProvider.notifier)
-                  .playQueue(results.songs,
-                      startIndex: results.songs.indexOf(song)),
-            ),
-          ),
-        ],
-        if (results.artists.isNotEmpty) ...[
-          gap24,
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: AppDimens.pagePadding),
-            child: SectionHeader(title: 'Artistas'),
-          ),
-          gap8,
-          ...results.artists.map(
-            (artist) => ArtistTile(
+                  .playQueue(results.songs, startIndex: index - 1),
+            );
+          }
+          index -= 1 + songsLen;
+        }
+        if (artistsLen > 0) {
+          if (index == 0) return artistsHeader!;
+          if (index < 1 + artistsLen) {
+            final artist = results.artists[index - 1];
+            return ArtistTile(
               artist: artist,
               onTap: () => context.push('/artist/${artist.id}'),
-            ),
-          ),
-        ],
-        if (results.albums.isNotEmpty) ...[
-          gap24,
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: AppDimens.pagePadding),
-            child: SectionHeader(title: 'Álbumes'),
-          ),
-          gap8,
-          ...results.albums.map(
-            (album) => AlbumTile(
-              album: album,
-              onTap: () => context.push('/album/${album.id}'),
-            ),
-          ),
-        ],
-      ],
+            );
+          }
+          index -= 1 + artistsLen;
+        }
+        if (albumsLen > 0) {
+          if (index == 0) return albumsHeader!;
+          final album = results.albums[index - 1];
+          return AlbumTile(
+            album: album,
+            onTap: () => context.push('/album/${album.id}'),
+          );
+        }
+        return const SizedBox.shrink();
+      },
     );
   }
 }
 
 class _GenreCard extends StatelessWidget {
-  const _GenreCard({required this.label, required this.color});
+  const _GenreCard({
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
 
   final String label;
   final Color color;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: color,
+    return Material(
+      color: color,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(12),
-      ),
-      alignment: Alignment.topLeft,
-      child: Text(
-        label,
-        style: theme.textTheme.titleSmall?.copyWith(
-          fontWeight: FontWeight.w700,
-          color: Colors.white,
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          alignment: Alignment.topLeft,
+          child: Text(
+            label,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
+          ),
         ),
       ),
     );

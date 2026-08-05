@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimens.dart';
 import '../../../core/utils/app_gaps.dart';
+import '../../../features/library/presentation/providers/music_library_provider.dart';
 import '../../../shared/widgets/rounded_card.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -26,6 +28,8 @@ class SettingsScreen extends StatelessWidget {
             ),
             gap24,
             const _AppInfoCard(),
+            gap24,
+            const _LibraryScanCard(),
             gap24,
             const SectionHeaderWidget(
               title: 'Apariencia',
@@ -167,6 +171,107 @@ class _AppInfoCard extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LibraryScanCard extends ConsumerWidget {
+  const _LibraryScanCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    // Watching the library keeps this card fresh after any rescan.
+    ref.watch(musicLibraryProvider);
+    final metrics = ref.watch(scanMetricsProvider).valueOrNull;
+
+    return RoundedCard(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.manage_search, color: AppColors.textSecondary),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Biblioteca',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              TextButton.icon(
+                onPressed: () =>
+                    ref.read(musicLibraryProvider.notifier).refresh(),
+                icon: const Icon(Icons.refresh, size: 18),
+                label: const Text('Escanear'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          if (metrics == null)
+            Text(
+              'Aún no se ha escaneado la biblioteca.',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            )
+          else ...[
+            Text(
+              'Último escaneo: ${_formatDate(metrics.scannedAt)}',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 8),
+            _MetricRow(label: 'Canciones indexadas', value: '${metrics.filesProcessed}'),
+            _MetricRow(label: 'Nuevas / actualizadas', value: '${metrics.newFiles}'),
+            _MetricRow(label: 'Reutilizadas de caché', value: '${metrics.reusedFromCache}'),
+            _MetricRow(label: 'Eliminadas', value: '${metrics.deletedFiles}'),
+          ],
+        ],
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    String two(int n) => n.toString().padLeft(2, '0');
+    return '${two(date.day)}/${two(date.month)}/${date.year} '
+        '${two(date.hour)}:${two(date.minute)}';
+  }
+}
+
+class _MetricRow extends StatelessWidget {
+  const _MetricRow({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+          Text(
+            value,
+            style: theme.textTheme.bodySmall?.copyWith(
+              fontWeight: FontWeight.w700,
             ),
           ),
         ],

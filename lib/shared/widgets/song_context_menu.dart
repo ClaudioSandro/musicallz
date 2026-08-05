@@ -70,6 +70,18 @@ class _SongContextMenu extends ConsumerWidget {
       );
   }
 
+  void _notify(BuildContext context, String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
@@ -172,6 +184,28 @@ class _SongContextMenu extends ConsumerWidget {
               },
             ),
             item(
+              icon: Icons.queue_music,
+              label: 'Play next',
+              onTap: () {
+                HapticFeedback.selectionClick();
+                Navigator.of(context).pop();
+                if (!callerContext.mounted) return;
+                player.playNext(song);
+                _notify(callerContext, 'Playing next');
+              },
+            ),
+            item(
+              icon: Icons.add_to_queue,
+              label: 'Add to queue',
+              onTap: () {
+                HapticFeedback.selectionClick();
+                Navigator.of(context).pop();
+                if (!callerContext.mounted) return;
+                player.addToQueue(song);
+                _notify(callerContext, 'Added to queue');
+              },
+            ),
+            item(
               icon: isFavorite ? Icons.favorite : Icons.favorite_border,
               label: isFavorite
                   ? 'Remove from Liked Songs'
@@ -194,19 +228,29 @@ class _SongContextMenu extends ConsumerWidget {
                 },
               ),
             item(
-              icon: Icons.queue_music,
-              label: 'Play next',
-              onTap: () => _placeholder(context, 'Play next'),
-            ),
-            item(
               icon: Icons.person_outline,
               label: 'Go to artist',
-              onTap: () => _placeholder(context, 'Go to artist'),
+              onTap: () {
+                HapticFeedback.selectionClick();
+                Navigator.of(context).pop();
+                if (!callerContext.mounted) return;
+                callerContext.push(
+                  '/artist/${song.artist.trim().toLowerCase()}',
+                );
+              },
             ),
             item(
               icon: Icons.album_outlined,
               label: 'Go to album',
-              onTap: () => _placeholder(context, 'Go to album'),
+              onTap: () {
+                HapticFeedback.selectionClick();
+                Navigator.of(context).pop();
+                if (!callerContext.mounted) return;
+                callerContext.push(
+                  '/album/${song.artist.trim().toLowerCase()}'
+                  '::${song.album.trim().toLowerCase()}',
+                );
+              },
             ),
             item(
               icon: Icons.share_outlined,

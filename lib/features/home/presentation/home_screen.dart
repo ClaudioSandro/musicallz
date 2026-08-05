@@ -154,12 +154,12 @@ class _HomeContent extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final recentStart = songs.length > HomeScreen._recentLimit
-        ? songs.length - HomeScreen._recentLimit
-        : 0;
-    final recent = songs.sublist(recentStart).reversed.toList();
+    final index = ref.watch(libraryIndexProvider);
+    final recent = (ref.watch(recentlyAddedProvider))
+        .take(HomeScreen._recentLimit)
+        .toList();
 
-    final artists = ref.watch(artistsProvider);
+    final artists = index?.topArtists ?? const [];
     final albums = ref.watch(albumsProvider);
     final currentSong = ref.watch(currentSongProvider);
     final hasActive = ref.watch(hasActiveSongProvider);

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:isar/isar.dart';
 
 import '../../../library/domain/entities/song.dart';
 import '../../../library/presentation/providers/music_library_provider.dart';
@@ -10,12 +9,9 @@ import '../../data/repositories/isar_favorites_repository.dart';
 import '../../data/repositories/isar_playlist_repository.dart';
 import '../../domain/repositories/favorites_repository.dart';
 import '../../domain/repositories/playlist_repository.dart';
+import 'isar_provider.dart';
 
 /// Overridden in `main()` with the Isar instance opened before `runApp`.
-final isarProvider = Provider<Isar>(
-  (_) => throw UnimplementedError('isarProvider must be overridden in main()'),
-);
-
 final playlistRepositoryProvider = Provider<PlaylistRepository>(
   (ref) => IsarPlaylistRepository(ref.watch(isarProvider)),
 );

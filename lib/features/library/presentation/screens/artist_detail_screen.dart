@@ -35,16 +35,18 @@ class ArtistDetailScreen extends ConsumerWidget {
       );
     }
 
-    // Group the artist's songs by album title, preserving order of appearance.
-    final albums = ref.watch(albumsProvider);
-    final orderedAlbums = albums.where((a) => a.artist == artist.name).toList();
+    // Albums that contain any song by this artist (a song may be part of an
+    // album attributed to a different album artist).
+    final orderedAlbums =
+        ref.watch(libraryIndexProvider)?.albumsForArtist(artistId) ??
+            const <Album>[];
 
     return Scaffold(
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
             pinned: true,
-            expandedHeight: 320,
+            expandedHeight: 380,
             backgroundColor: theme.colorScheme.surface,
             surfaceTintColor: Colors.transparent,
             leading: IconButton(
@@ -102,60 +104,76 @@ class _ArtistHeader extends StatelessWidget {
             ),
           ),
         ),
-        SingleChildScrollView(
-          padding: const EdgeInsets.all(AppDimens.pagePadding),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                artist.name,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.headlineLarge?.copyWith(
-                  fontWeight: FontWeight.w900,
-                  color: Colors.white,
-                ),
+        // SafeArea keeps the header below the status bar (it used to overlap
+        // the clock/battery and the back arrow); Align.topCenter centers it.
+        SafeArea(
+          bottom: false,
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(
+                AppDimens.pagePadding,
+                AppDimens.pagePadding,
+                AppDimens.pagePadding,
+                40,
               ),
-              gap4,
-              Text(
-                'Artista',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: Colors.white70,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 1.2,
-                ),
-              ),
-              gap8,
-              Wrap(
-                spacing: 16,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  _Stat(value: '${artist.songCount}', label: 'canciones'),
-                  _Stat(value: '${artist.albumCount}', label: 'álbumes'),
-                ],
-              ),
-              gap16,
-              Row(
-                children: [
-                  IconButton.filled(
-                    onPressed: onPlay,
-                    icon: const Icon(Icons.play_arrow, size: 28),
-                    tooltip: 'Play artist',
-                    style: IconButton.styleFrom(
-                      backgroundColor: theme.colorScheme.primary,
-                      foregroundColor: Colors.black,
+                  Text(
+                    artist.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.headlineLarge?.copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
                     ),
                   ),
-                  gap12,
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.favorite_border,
-                        color: Colors.white),
-                    tooltip: 'Follow artist',
+                  gap4,
+                  Text(
+                    'Artista',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: Colors.white70,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  gap8,
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 16,
+                    children: [
+                      _Stat(value: '${artist.songCount}', label: 'canciones'),
+                      _Stat(value: '${artist.albumCount}', label: 'álbumes'),
+                    ],
+                  ),
+                  gap16,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton.filled(
+                        onPressed: onPlay,
+                        icon: const Icon(Icons.play_arrow, size: 28),
+                        tooltip: 'Play artist',
+                        style: IconButton.styleFrom(
+                          backgroundColor: theme.colorScheme.primary,
+                          foregroundColor: Colors.black,
+                        ),
+                      ),
+                      gap12,
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.favorite_border,
+                            color: Colors.white),
+                        tooltip: 'Follow artist',
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
         ),
       ],

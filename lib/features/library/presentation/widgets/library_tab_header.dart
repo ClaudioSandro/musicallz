@@ -3,10 +3,18 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_dimens.dart';
 
 class LibraryTabHeader extends StatelessWidget {
-  const LibraryTabHeader({super.key, required this.title, this.count});
+  const LibraryTabHeader({
+    super.key,
+    required this.title,
+    this.count,
+    this.trailing,
+  });
 
   final String title;
   final int? count;
+
+  /// Optional controls (sort / view toggles) aligned to the right edge.
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -19,23 +27,37 @@ class LibraryTabHeader extends StatelessWidget {
         8,
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.baseline,
-        textBaseline: TextBaseline.alphabetic,
         children: [
-          Text(
-            title,
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w800,
+          Expanded(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Flexible(
+                  child: Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                if (count != null) ...[
+                  const SizedBox(width: 8),
+                  Text(
+                    '$count',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
-          if (count != null) ...[
+          if (trailing != null) ...[
             const SizedBox(width: 8),
-            Text(
-              '$count',
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
+            trailing!,
           ],
         ],
       ),

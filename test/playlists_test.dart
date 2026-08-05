@@ -5,6 +5,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 import 'package:musicallz/app/app.dart';
 import 'package:musicallz/app/router.dart';
+import 'package:musicallz/features/library/data/models/library_scan_metrics.dart';
 import 'package:musicallz/features/library/domain/entities/song.dart';
 import 'package:musicallz/features/library/domain/repositories/music_repository.dart';
 import 'package:musicallz/features/library/presentation/providers/library_permission_provider.dart';
@@ -34,6 +35,15 @@ class _FakeMusicRepository implements MusicRepository {
       filePath: '/music/song-b.mp3',
     ),
   ];
+
+  @override
+  Future<List<Song>> rescan() async => getSongs();
+
+  @override
+  Future<LibraryScanMetrics?> scanMetrics() async => null;
+
+  @override
+  Future<void> recordPlay(String songId) async {}
 }
 
 late InMemoryPlaylistRepository playlistsRepo;

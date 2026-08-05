@@ -21,11 +21,16 @@ class SongListTile extends ConsumerWidget {
     required this.song,
     this.onTap,
     this.queue,
+    this.compact = false,
   });
 
   final Song song;
   final VoidCallback? onTap;
   final List<Song>? queue;
+
+  /// When true, renders a denser row (smaller art, single-line subtitle)
+  /// for the Songs "compact" view.
+  final bool compact;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -45,10 +50,61 @@ class SongListTile extends ConsumerWidget {
       color: isCurrent ? accent : theme.colorScheme.onSurfaceVariant,
     );
 
+    if (compact) {
+      return ListTile(
+        onTap: onTap,
+        onLongPress: () =>
+            openSongContextMenu(context, ref, song, queue: queue),
+        leading: CoverArt(
+          bytes: song.albumArt,
+          filePath: song.albumArtPath,
+          size: 40,
+          radius: 6,
+        ),
+        title: Text(
+          song.title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: isCurrent ? accent : null,
+          ),
+        ),
+        subtitle: Text(
+          '${song.artist} · ${formatDuration(song.duration)}',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: isCurrent ? accent : theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+        trailing: IconButton(
+          onPressed: () => openSongContextMenu(
+            context,
+            ref,
+            song,
+            queue: queue,
+          ),
+          icon: const Icon(Icons.more_horiz, size: 18),
+          visualDensity: VisualDensity.compact,
+          color: theme.colorScheme.onSurfaceVariant,
+          tooltip: 'More options',
+        ),
+        minLeadingWidth: 0,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+        dense: true,
+      );
+    }
+
     return ListTile(
       onTap: onTap,
       onLongPress: () => openSongContextMenu(context, ref, song, queue: queue),
-      leading: CoverArt(bytes: song.albumArt, size: 48, radius: 8),
+      leading: CoverArt(
+        bytes: song.albumArt,
+        filePath: song.albumArtPath,
+        size: 48,
+        radius: 8,
+      ),
       title: Text(
         song.title,
         maxLines: 1,

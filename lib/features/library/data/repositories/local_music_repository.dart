@@ -6,6 +6,7 @@ import '../../domain/entities/song.dart';
 import '../../domain/exceptions/music_library_exceptions.dart';
 import '../../domain/repositories/music_repository.dart';
 import '../datasources/local_music_datasource.dart';
+import '../models/library_scan_metrics.dart';
 import '../models/raw_media_metadata.dart';
 
 class LocalMusicRepository implements MusicRepository {
@@ -19,6 +20,21 @@ class LocalMusicRepository implements MusicRepository {
 
   @override
   Future<List<Song>> getSongs() async {
+    return _scan();
+  }
+
+  @override
+  Future<List<Song>> rescan() async {
+    return _scan();
+  }
+
+  @override
+  Future<LibraryScanMetrics?> scanMetrics() async => null;
+
+  @override
+  Future<void> recordPlay(String songId) async {}
+
+  Future<List<Song>> _scan() async {
     final root = await _datasource.resolveLibraryRoot();
     if (root == null || !await root.exists()) return const [];
 
@@ -61,6 +77,10 @@ class LocalMusicRepository implements MusicRepository {
       trackNumber: metadata?.trackNumber,
       year: metadata?.year,
       albumArt: metadata?.albumArt,
+      albumArtist: metadata?.albumArtist,
+      genre: metadata?.genre,
+      composer: metadata?.composer,
+      discNumber: metadata?.discNumber,
     );
   }
 

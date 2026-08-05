@@ -39,6 +39,7 @@ class MainActivity : AudioServiceActivity() {
 
     private fun buildMap(r: MediaMetadataRetriever): Map<String, Any?> {
         val track = r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER)
+        val disc = r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DISC_NUMBER)
         return mapOf(
             "title" to r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE),
             "artist" to r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST),
@@ -48,6 +49,10 @@ class MainActivity : AudioServiceActivity() {
             "track" to track?.substringBefore('/')?.trim()?.toIntOrNull(),
             "year" to r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_YEAR)
                 ?.toIntOrNull(),
+            "genre" to r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE),
+            "composer" to r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_COMPOSER),
+            "albumArtist" to r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST),
+            "discNumber" to disc?.substringBefore('/')?.trim()?.toIntOrNull(),
             "albumArt" to r.embeddedPicture
         )
     }

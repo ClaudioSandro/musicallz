@@ -11,6 +11,7 @@ class Album {
     required this.songs,
     this.year,
     this.coverArt,
+    this.coverArtPath,
   });
 
   final String id;
@@ -20,4 +21,5 @@ class Album {
   final List<Song> songs;
   final int? year;
   final Uint8List? coverArt;
+  final String? coverArtPath;
 }

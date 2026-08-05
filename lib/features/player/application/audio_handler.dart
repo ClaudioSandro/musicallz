@@ -55,7 +55,9 @@ class MusicallAudioHandler extends BaseAudioHandler {
         duration: song.duration,
         artUri: song.albumArt != null
             ? Uri.dataFromBytes(song.albumArt!, mimeType: 'image/jpeg')
-            : null,
+            : song.albumArtPath != null
+                ? Uri.file(song.albumArtPath!)
+                : null,
       );
 
   void _onIndexChanged(int? index) {

@@ -8,7 +8,9 @@ import '../features/library/presentation/screens/artist_detail_screen.dart';
 import '../features/library/presentation/screens/library_screen.dart';
 import '../features/library/presentation/screens/liked_songs_screen.dart';
 import '../features/player/presentation/screens/now_playing_screen.dart';
+import '../features/player/presentation/screens/queue_screen.dart';
 import '../features/playlists/presentation/screens/playlist_detail_screen.dart';
+import '../features/search/presentation/genre_detail_screen.dart';
 import '../features/search/presentation/search_screen.dart';
 import '../features/settings/presentation/settings_screen.dart';
 
@@ -81,6 +83,11 @@ final appRouter = GoRouter(
       builder: (context, state) => const NowPlayingScreen(),
     ),
     GoRoute(
+      path: '/queue',
+      name: 'queue',
+      builder: (context, state) => const QueueScreen(),
+    ),
+    GoRoute(
       path: '/playlist/:playlistId',
       name: 'playlist',
       builder: (context, state) => PlaylistDetailScreen(
@@ -91,6 +98,14 @@ final appRouter = GoRouter(
       path: '/liked-songs',
       name: 'liked-songs',
       builder: (context, state) => const LikedSongsScreen(),
+    ),
+    GoRoute(
+      path: '/genre/:genreName',
+      name: 'genre',
+      builder: (context, state) => GenreDetailScreen(
+        genreName:
+            Uri.decodeComponent(state.pathParameters['genreName']!),
+      ),
     ),
   ],
 );

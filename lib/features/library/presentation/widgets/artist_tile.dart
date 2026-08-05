@@ -16,6 +16,7 @@ class ArtistTile extends StatelessWidget {
       onTap: onTap,
       leading: CoverArt(
         bytes: artist.coverArt,
+        filePath: artist.coverArtPath,
         size: 48,
         circular: true,
         icon: Icons.person,

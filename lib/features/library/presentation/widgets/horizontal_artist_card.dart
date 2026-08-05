@@ -21,6 +21,7 @@ class HorizontalArtistCard extends StatelessWidget {
           children: [
             CoverArt(
               bytes: artist.coverArt,
+              filePath: artist.coverArtPath,
               size: 100,
               circular: true,
               icon: Icons.person,

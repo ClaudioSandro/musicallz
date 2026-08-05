@@ -14,7 +14,11 @@ class AlbumTile extends StatelessWidget {
     final theme = Theme.of(context);
     return ListTile(
       onTap: onTap,
-      leading: CoverArt(bytes: album.coverArt, size: 48),
+      leading: CoverArt(
+        bytes: album.coverArt,
+        filePath: album.coverArtPath,
+        size: 48,
+      ),
       title: Text(
         album.title,
         maxLines: 1,

@@ -5,11 +5,12 @@ import 'package:permission_handler/permission_handler.dart';
 
 import 'package:musicallz/app/app.dart';
 import 'package:musicallz/app/router.dart';
+import 'package:musicallz/features/library/data/models/library_scan_metrics.dart';
 import 'package:musicallz/features/library/domain/entities/song.dart';
 import 'package:musicallz/features/library/domain/repositories/music_repository.dart';
 import 'package:musicallz/features/library/presentation/providers/library_permission_provider.dart';
 import 'package:musicallz/features/library/presentation/providers/music_repository_provider.dart';
-import 'package:musicallz/features/library/presentation/widgets/album_tile.dart';
+import 'package:musicallz/features/library/presentation/widgets/album_card.dart';
 import 'package:musicallz/features/library/presentation/widgets/artist_tile.dart';
 import 'package:musicallz/features/player/domain/models/player_state.dart';
 import 'package:musicallz/features/player/presentation/providers/player_providers.dart';
@@ -39,6 +40,15 @@ class _LongTitleRepository implements MusicRepository {
           trackNumber: i + 1,
         ),
       );
+
+  @override
+  Future<List<Song>> rescan() async => getSongs();
+
+  @override
+  Future<LibraryScanMetrics?> scanMetrics() async => null;
+
+  @override
+  Future<void> recordPlay(String songId) async {}
 }
 
 Widget _app() => ProviderScope(
@@ -102,7 +112,7 @@ void main() {
     await _openLibrary(tester);
     await _openTab(tester, 'Albums');
 
-    await tester.tap(find.byType(AlbumTile).first);
+    await tester.tap(find.byType(AlbumCard).first);
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
   });
@@ -155,7 +165,7 @@ void main() {
     await _openTab(tester, 'Albums');
     expect(tester.takeException(), isNull);
 
-    await tester.tap(find.byType(AlbumTile).first);
+    await tester.tap(find.byType(AlbumCard).first);
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
   });

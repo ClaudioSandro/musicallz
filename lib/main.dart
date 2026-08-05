@@ -9,9 +9,11 @@ import 'package:permission_handler/permission_handler.dart';
 
 import 'app/app.dart';
 import 'features/player/application/audio_handler.dart';
+import 'features/player/application/session_store.dart';
 import 'features/player/presentation/providers/audio_service_providers.dart';
+import 'features/player/presentation/providers/player_providers.dart';
 import 'features/playlists/data/datasources/isar_database.dart';
-import 'features/playlists/presentation/providers/playlist_providers.dart';
+import 'features/playlists/presentation/providers/isar_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,6 +33,7 @@ Future<void> main() async {
       overrides: [
         audioPlayerProvider.overrideWithValue(audioPlayer),
         audioHandlerProvider.overrideWithValue(audioHandler),
+        sessionStoreProvider.overrideWithValue(IsarSessionStore(isar)),
         isarProvider.overrideWithValue(isar),
       ],
       child: const MusicallzApp(),

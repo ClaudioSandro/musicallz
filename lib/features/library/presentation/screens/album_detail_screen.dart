@@ -45,7 +45,7 @@ class AlbumDetailScreen extends ConsumerWidget {
         slivers: [
           SliverAppBar(
             pinned: true,
-            expandedHeight: 360,
+            expandedHeight: 450,
             backgroundColor: theme.colorScheme.surface,
             surfaceTintColor: Colors.transparent,
             leading: IconButton(
@@ -142,7 +142,12 @@ class _AlbumHeader extends StatelessWidget {
           child: Align(
             alignment: Alignment.topCenter,
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(AppDimens.pagePadding),
+              padding: const EdgeInsets.fromLTRB(
+                AppDimens.pagePadding,
+                AppDimens.pagePadding,
+                AppDimens.pagePadding,
+                40,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,

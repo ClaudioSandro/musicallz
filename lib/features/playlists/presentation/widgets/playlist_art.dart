@@ -30,9 +30,9 @@ class PlaylistArt extends ConsumerWidget {
       return Image.memory(bytes, fit: BoxFit.cover);
     }
 
-    Widget? fileBased(String path) {
-      if (File(path).existsSync()) return Image.file(File(path), fit: BoxFit.cover);
-      return null;
+    Widget? fileBased(String? path) {
+      if (path == null || !File(path).existsSync()) return null;
+      return Image.file(File(path), fit: BoxFit.cover);
     }
 
     final map = ref.watch(songByIdProvider);
@@ -40,10 +40,14 @@ class PlaylistArt extends ConsumerWidget {
         .map((id) => map[id]?.albumArt)
         .where((art) => art != null)
         .firstOrNull;
+    final firstArtPath = playlist.songIds
+        .map((id) => map[id]?.albumArtPath)
+        .whereType<String>()
+        .firstOrNull;
 
     final Widget? child = coverPath != null
-        ? fileBased(coverPath) ?? bytesBased(firstArt)
-        : bytesBased(firstArt);
+        ? fileBased(coverPath) ?? fileBased(firstArtPath) ?? bytesBased(firstArt)
+        : fileBased(firstArtPath) ?? bytesBased(firstArt);
 
     final fallback = DecoratedBox(
       decoration: const BoxDecoration(

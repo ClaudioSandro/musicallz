@@ -22,6 +22,11 @@ final albumsProvider = Provider<List<Album>>(
   (ref) => ref.watch(libraryIndexProvider)?.albums ?? const [],
 );
 
+/// Songs ordered by first-seen date (newest first).
+final recentlyAddedProvider = Provider<List<Song>>(
+  (ref) => ref.watch(libraryIndexProvider)?.recentlyAdded ?? const [],
+);
+
 final artistProvider = Provider.family<Artist?, String>(
   (ref, artistId) {
     final artists = ref.watch(artistsProvider);

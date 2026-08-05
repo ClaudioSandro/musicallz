@@ -303,7 +303,7 @@ class _PlaylistSongTile extends ConsumerWidget {
               ),
             ),
           ),
-          CoverArt(bytes: song.albumArt, size: 48, radius: 8),
+          CoverArt(bytes: song.albumArt, filePath: song.albumArtPath, size: 48, radius: 8),
         ],
       ),
       title: Text(

@@ -8,6 +8,9 @@ import '../../../../features/playlists/presentation/widgets/playlist_tile.dart'
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/song_list_tile.dart';
 import '../../../player/presentation/providers/player_providers.dart';
+import '../../domain/services/library_index.dart';
+import '../providers/library_prefs_provider.dart';
+import '../widgets/sort_menu_button.dart';
 
 class LikedSongsScreen extends ConsumerWidget {
   const LikedSongsScreen({super.key});
@@ -15,6 +18,8 @@ class LikedSongsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final songs = ref.watch(likedSongsProvider);
+    final prefs = ref.watch(libraryPrefsProvider);
+    final sorted = sortSongs(songs, prefs.likedSort);
     final totalDuration = songs.fold<Duration>(
       Duration.zero,
       (acc, song) => acc + song.duration,
@@ -30,12 +35,30 @@ class LikedSongsScreen extends ConsumerWidget {
               totalDuration: totalDuration,
               onPlay: () => ref
                   .read(playerControllerProvider.notifier)
-                  .playQueue(songs),
+                  .playQueue(sorted),
               onShuffle: () async {
                 final ctrl = ref.read(playerControllerProvider.notifier);
                 await ctrl.applyAudioShuffle(true);
-                await ctrl.playQueue(songs);
+                await ctrl.playQueue(sorted);
               },
+              sortButton: SortMenuButton<SongsSort>(
+                options: const [
+                  (value: SongsSort.titleAsc, label: 'Título (A→Z)', icon: Icons.sort_by_alpha),
+                  (value: SongsSort.titleDesc, label: 'Título (Z→A)', icon: Icons.sort_by_alpha),
+                  (value: SongsSort.artistAsc, label: 'Artista', icon: Icons.person_outline),
+                  (value: SongsSort.albumAsc, label: 'Álbum', icon: Icons.album_outlined),
+                  (value: SongsSort.addedNew, label: 'Añadidas recientemente', icon: Icons.add_circle_outline),
+                  (value: SongsSort.addedOld, label: 'Añadidas hace más', icon: Icons.history),
+                  (value: SongsSort.yearNew, label: 'Año (nuevas)', icon: Icons.calendar_today_outlined),
+                  (value: SongsSort.yearOld, label: 'Año (viejas)', icon: Icons.calendar_today_outlined),
+                  (value: SongsSort.durationLong, label: 'Duración (más largas)', icon: Icons.timer_outlined),
+                  (value: SongsSort.durationShort, label: 'Duración (más cortas)', icon: Icons.timer_outlined),
+                  (value: SongsSort.mostPlayed, label: 'Más reproducidas', icon: Icons.trending_up),
+                ],
+                selected: prefs.likedSort,
+                onSelected: (v) =>
+                    ref.read(libraryPrefsProvider.notifier).setLikedSort(v),
+              ),
             ),
             const Divider(height: 1, color: Colors.white12),
             Expanded(
@@ -46,15 +69,15 @@ class LikedSongsScreen extends ConsumerWidget {
                       message: 'Tap the heart on any song to save it here.',
                     )
                   : ListView.builder(
-                      itemCount: songs.length,
+                      itemCount: sorted.length,
                       itemBuilder: (context, index) {
-                        final song = songs[index];
+                        final song = sorted[index];
                         return SongListTile(
                           song: song,
-                          queue: songs,
+                          queue: sorted,
                           onTap: () => ref
                               .read(playerControllerProvider.notifier)
-                              .playQueue(songs, startIndex: index),
+                              .playQueue(sorted, startIndex: index),
                         );
                       },
                     ),
@@ -72,12 +95,14 @@ class _LikedHeader extends StatelessWidget {
     required this.totalDuration,
     required this.onPlay,
     required this.onShuffle,
+    required this.sortButton,
   });
 
   final int count;
   final Duration totalDuration;
   final VoidCallback onPlay;
   final VoidCallback onShuffle;
+  final Widget sortButton;
 
   @override
   Widget build(BuildContext context) {
@@ -95,6 +120,7 @@ class _LikedHeader extends StatelessWidget {
                 tooltip: 'Back',
               ),
               const Spacer(),
+              sortButton,
             ],
           ),
           Row(
