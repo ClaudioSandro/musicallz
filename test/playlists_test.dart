@@ -133,6 +133,62 @@ void main() {
     expect(find.textContaining('1 song'), findsOneWidget);
   });
 
+  testWidgets('Adding a song to a playlist via the context menu persists',
+      (tester) async {
+    await playlistsRepo.createPlaylist('Gym Mix');
+
+    await _boot(tester);
+
+    final songARow = find.ancestor(
+      of: find.text('Song A'),
+      matching: find.byType(SongListTile),
+    );
+    await tester.tap(
+      find.descendant(
+        of: songARow,
+        matching: find.byIcon(Icons.more_horiz),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Add to playlist'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Gym Mix'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Added to Gym Mix'), findsOneWidget);
+
+    await _openLibrary(tester);
+    await tester.tap(find.text('Gym Mix'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Song A'), findsOneWidget);
+    expect(find.textContaining('1 song'), findsOneWidget);
+  });
+
+  testWidgets('Context menu does not overflow on short screens', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(320, 480));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await _boot(tester);
+
+    final songARow = find.ancestor(
+      of: find.text('Song A'),
+      matching: find.byType(SongListTile),
+    );
+    await tester.tap(
+      find.descendant(
+        of: songARow,
+        matching: find.byIcon(Icons.more_horiz),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('Play next'), findsOneWidget);
+  });
+
   testWidgets('Playlist detail plays and reorders its songs', (tester) async {
     final playlist = await playlistsRepo.createPlaylist(
       'Favorites Mix',

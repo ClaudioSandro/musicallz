@@ -135,67 +135,75 @@ class _AlbumHeader extends StatelessWidget {
             ),
           ),
         ),
-        Align(
-          alignment: Alignment.topLeft,
-          // Scrollable so long titles / large text don't overflow the header.
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(AppDimens.pagePadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                heroImage,
-                gap16,
-                Text(
-                  album.title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
+        // SafeArea keeps the content below the status bar on edge-to-edge
+        // displays; Align.topCenter centers the cover horizontally.
+        SafeArea(
+          bottom: false,
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(AppDimens.pagePadding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  heroImage,
+                  gap16,
+                  Text(
+                    album.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
-                gap4,
-                Text(
-                  album.artist,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                  gap4,
+                  Text(
+                    album.artist,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
-                gap4,
-                Text(
-                  subtitle,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.white70,
+                  gap4,
+                  Text(
+                    subtitle,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: Colors.white70,
+                    ),
                   ),
-                ),
-                gap16,
-                Row(
-                  children: [
-                    IconButton.filled(
-                      onPressed: onPlay,
-                      icon: const Icon(Icons.play_arrow, size: 28),
-                      tooltip: 'Play album',
-                      style: IconButton.styleFrom(
-                        backgroundColor: theme.colorScheme.primary,
-                        foregroundColor: Colors.black,
+                  gap16,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton.filled(
+                        onPressed: onPlay,
+                        icon: const Icon(Icons.play_arrow, size: 28),
+                        tooltip: 'Play album',
+                        style: IconButton.styleFrom(
+                          backgroundColor: theme.colorScheme.primary,
+                          foregroundColor: Colors.black,
+                        ),
                       ),
-                    ),
-                    gap12,
-                    IconButton(
-                      onPressed: () {},
-                      icon: const Icon(Icons.favorite_border,
-                          color: Colors.white),
-                      tooltip: 'Save album',
-                    ),
-                  ],
-                ),
-              ],
+                      gap12,
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.favorite_border,
+                            color: Colors.white),
+                        tooltip: 'Save album',
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),

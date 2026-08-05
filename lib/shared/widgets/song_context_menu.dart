@@ -15,33 +15,47 @@ import '../../features/playlists/presentation/widgets/add_to_playlist_sheet.dart
 ///
 /// Playback uses the current [queue] (defaults to just the song). When
 /// [playlist] is provided, an extra "Remove from playlist" action is shown.
+///
+/// Actions that keep running after the sheet closes (like "Add to playlist")
+/// use [callerContext]/[callerRef] from the opening screen instead of the
+/// sheet's own context, which is disposed as soon as the sheet pops.
 Future<void> openSongContextMenu(
-  BuildContext context,
-  WidgetRef ref,
+  BuildContext callerContext,
+  WidgetRef callerRef,
   Song song, {
   List<Song>? queue,
   Playlist? playlist,
 }) {
   return showModalBottomSheet<void>(
-    context: context,
+    context: callerContext,
     backgroundColor: AppColors.surface,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
-    builder: (context) => _SongContextMenu(
+    builder: (sheetContext) => _SongContextMenu(
       song: song,
       queue: queue,
       playlist: playlist,
+      callerContext: callerContext,
+      callerRef: callerRef,
     ),
   );
 }
 
 class _SongContextMenu extends ConsumerWidget {
-  const _SongContextMenu({required this.song, this.queue, this.playlist});
+  const _SongContextMenu({
+    required this.song,
+    this.queue,
+    this.playlist,
+    required this.callerContext,
+    required this.callerRef,
+  });
 
   final Song song;
   final List<Song>? queue;
   final Playlist? playlist;
+  final BuildContext callerContext;
+  final WidgetRef callerRef;
 
   void _placeholder(BuildContext context, String message) {
     HapticFeedback.selectionClick();
@@ -62,6 +76,8 @@ class _SongContextMenu extends ConsumerWidget {
     final list = queue ?? [song];
     final isFavorite = ref.watch(isFavoriteProvider(song.id));
     final favoritesRepo = ref.read(favoritesRepositoryProvider);
+    final playlistRepo = ref.read(playlistRepositoryProvider);
+    final player = ref.read(playerControllerProvider.notifier);
     final currentPlaylist = playlist;
 
     Widget item({
@@ -87,7 +103,9 @@ class _SongContextMenu extends ConsumerWidget {
 
     return SafeArea(
       top: false,
-      child: Padding(
+      // The menu can outgrow small screens, so the whole list scrolls instead
+      // of overflowing ("BOTTOM OVERFLOWED BY N PIXELS").
+      child: SingleChildScrollView(
         padding: const EdgeInsets.only(top: 8),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -140,8 +158,7 @@ class _SongContextMenu extends ConsumerWidget {
               onTap: () {
                 HapticFeedback.selectionClick();
                 Navigator.of(context).pop();
-                ref.read(playerControllerProvider.notifier)
-                    .playQueue(list, startIndex: list.indexOf(song));
+                player.playQueue(list, startIndex: list.indexOf(song));
               },
             ),
             item(
@@ -150,7 +167,8 @@ class _SongContextMenu extends ConsumerWidget {
               onTap: () {
                 HapticFeedback.selectionClick();
                 Navigator.of(context).pop();
-                showAddToPlaylistSheet(context, ref, song);
+                if (!callerContext.mounted) return;
+                showAddToPlaylistSheet(callerContext, callerRef, song);
               },
             ),
             item(
@@ -171,9 +189,7 @@ class _SongContextMenu extends ConsumerWidget {
                 label: 'Remove from ${currentPlaylist.name}',
                 onTap: () {
                   HapticFeedback.selectionClick();
-                  ref
-                      .read(playlistRepositoryProvider)
-                      .removeSong(currentPlaylist.id, song.id);
+                  playlistRepo.removeSong(currentPlaylist.id, song.id);
                   Navigator.of(context).pop();
                 },
               ),
@@ -203,7 +219,8 @@ class _SongContextMenu extends ConsumerWidget {
               onTap: () {
                 HapticFeedback.selectionClick();
                 Navigator.of(context).pop();
-                context.push('/now-playing');
+                if (!callerContext.mounted) return;
+                callerContext.push('/now-playing');
               },
             ),
             const SizedBox(height: 8),
