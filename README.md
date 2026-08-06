@@ -10,7 +10,31 @@ Musicallz is designed for people who want full control over their music library 
 
 ## Screenshots
 
-*Add screenshots of Home, Library, Now Playing, and Playlists here.*
+<div align="center">
+
+| Home | Now Playing | Queue |
+|:---:|:---:|:---:|
+| ![Home](screenshots/home.jpeg) | ![Now Playing](screenshots/playing.jpeg) | ![Queue](screenshots/queue.jpeg) |
+
+| Search | Search results | Settings |
+|:---:|:---:|:---:|
+| ![Search](screenshots/search.jpeg) | ![Searching](screenshots/searching.jpeg) | ![Settings](screenshots/settings.jpeg) |
+
+| Playlists | Albums | Artists |
+|:---:|:---:|:---:|
+| ![Library Playlists](screenshots/library-playlists.jpeg) | ![Library Albums](screenshots/library-albums.jpeg) | ![Library Artists](screenshots/library-artists.jpeg) |
+
+| Songs | Artist screen | Media notification |
+|:---:|:---:|:---:|
+| ![Library Songs](screenshots/library-songs.jpeg) | ![Artist screen](screenshots/artist-screen.jpeg) | ![Notification island](screenshots/notification-island.jpeg) |
+
+| Notification with controls |
+|:---:|
+| ![Notification island controls](screenshots/notification-island-control.jpeg) |
+
+</div>
+
+*Screenshots taken on an Android phone.*
 
 ---
 
