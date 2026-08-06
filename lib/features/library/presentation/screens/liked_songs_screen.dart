@@ -62,7 +62,7 @@ class LikedSongsScreen extends ConsumerWidget {
                       ref.read(libraryPrefsProvider.notifier).setLikedSort(v),
                 ),
               ),
-              const Divider(height: 1, color: Colors.white12),
+              const Divider(height: 1),
               Expanded(
                 child: songs.isEmpty
                     ? const EmptyState(
@@ -183,13 +183,16 @@ class _LikedHeader extends StatelessWidget {
                 tooltip: 'Play',
                 style: IconButton.styleFrom(
                   backgroundColor: theme.colorScheme.primary,
-                  foregroundColor: Colors.black,
+                  foregroundColor: theme.colorScheme.onPrimary,
                 ),
               ),
               gap12,
               IconButton(
                 onPressed: onShuffle,
-                icon: const Icon(Icons.shuffle, color: Colors.white),
+                icon: Icon(
+                  Icons.shuffle,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
                 tooltip: 'Shuffle',
               ),
             ],

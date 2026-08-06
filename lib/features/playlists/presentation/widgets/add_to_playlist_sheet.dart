@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/app_gaps.dart';
 import '../../../library/domain/entities/song.dart';
 import '../../data/models/playlist.dart';
@@ -23,7 +22,7 @@ Future<void> showAddToPlaylistSheet(
 ) async {
   final selection = await showModalBottomSheet<Object>(
     context: context,
-    backgroundColor: AppColors.surface,
+    backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
@@ -105,7 +104,7 @@ class _AddToPlaylistSheet extends ConsumerWidget {
               onTap: () => Navigator.of(context).pop(_createNew),
             ),
             if (playlists.isNotEmpty) ...[
-              const Divider(height: 1, color: Colors.white12),
+              const Divider(height: 1),
               const SizedBox(height: 8),
               ConstrainedBox(
                 constraints: const BoxConstraints(maxHeight: 360),

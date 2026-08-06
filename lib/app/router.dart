@@ -12,6 +12,7 @@ import '../features/player/presentation/screens/queue_screen.dart';
 import '../features/playlists/presentation/screens/playlist_detail_screen.dart';
 import '../features/search/presentation/genre_detail_screen.dart';
 import '../features/search/presentation/search_screen.dart';
+import '../features/settings/presentation/appearance_screen.dart';
 import '../features/settings/presentation/settings_screen.dart';
 
 final rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -143,6 +144,12 @@ final appRouter = GoRouter(
               Uri.decodeComponent(state.pathParameters['genreName']!),
         ),
       ),
+    ),
+    GoRoute(
+      path: '/appearance',
+      name: 'appearance',
+      pageBuilder: (context, state) =>
+          _softTransition(const AppearanceScreen()),
     ),
   ],
 );

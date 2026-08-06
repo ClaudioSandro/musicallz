@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/utils/app_gaps.dart';
+import '../../../../core/theme/theme_extension.dart';
 import '../../../../core/widgets/player_bottom_shell.dart';
 import '../../../../features/player/presentation/providers/player_providers.dart';
 import '../../../../shared/widgets/empty_state.dart';
@@ -23,7 +23,6 @@ class ArtistDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
     final artist = ref.watch(artistProvider(artistId));
     final songs = ref.watch(artistSongsProvider(artistId));
 
@@ -53,8 +52,10 @@ class ArtistDetailScreen extends ConsumerWidget {
             SliverAppBar(
               pinned: true,
               expandedHeight: 320,
-              backgroundColor: theme.colorScheme.surface,
+              backgroundColor:
+                  Color.lerp(context.appTheme.gradientStart, Colors.black, 0.5)!,
               surfaceTintColor: Colors.transparent,
+              iconTheme: const IconThemeData(color: Colors.white),
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back),
                 onPressed: () => Navigator.of(context).pop(),
@@ -107,7 +108,7 @@ class _ArtistHeader extends ConsumerWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Color.lerp(AppColors.accent, Colors.black, 0.5)!,
+                Color.lerp(context.appTheme.gradientStart, Colors.black, 0.5)!,
                 Colors.black.withValues(alpha: 0.3),
               ],
             ),
@@ -186,7 +187,7 @@ class _ArtistHeader extends ConsumerWidget {
                         tooltip: 'Play artist',
                         style: IconButton.styleFrom(
                           backgroundColor: theme.colorScheme.primary,
-                          foregroundColor: Colors.black,
+                          foregroundColor: theme.colorScheme.onPrimary,
                         ),
                       ),
                       gap12,
@@ -196,7 +197,9 @@ class _ArtistHeader extends ConsumerWidget {
                             .toggle(artist.id),
                         icon: Icon(
                           followed ? Icons.check : Icons.person_add_alt_1,
-                          color: followed ? AppColors.accent : Colors.white,
+                          color: followed
+                              ? theme.colorScheme.primary
+                              : Colors.white,
                         ),
                         tooltip: followed ? 'Following' : 'Follow artist',
                       ),

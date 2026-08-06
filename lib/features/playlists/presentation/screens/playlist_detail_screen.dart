@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/format_duration.dart';
 import '../../../../core/utils/app_gaps.dart';
 import '../../../../core/widgets/player_bottom_shell.dart';
@@ -86,7 +85,8 @@ class PlaylistDetailScreen extends ConsumerWidget {
                   final confirmed = await showDialog<bool>(
                     context: context,
                     builder: (context) => AlertDialog(
-                      backgroundColor: AppColors.surface,
+                      backgroundColor:
+                          Theme.of(context).colorScheme.surfaceContainerLow,
                       title: const Text('Delete playlist?'),
                       content: Text(
                         '"${playlist.name}" and its play order will be '
@@ -112,7 +112,7 @@ class PlaylistDetailScreen extends ConsumerWidget {
                   if (context.mounted) Navigator.of(context).pop();
                 },
               ),
-              const Divider(height: 1, color: Colors.white12),
+              const Divider(height: 1),
               Expanded(
                 child: songs.isEmpty
                     ? const EmptyState(
@@ -194,7 +194,7 @@ class _PlaylistHeader extends StatelessWidget {
                   if (value == 'edit') onEdit();
                   if (value == 'delete') onDelete();
                 },
-                color: AppColors.surfaceHigh,
+                color: Theme.of(context).colorScheme.surfaceContainerHigh,
                 itemBuilder: (context) => const [
                   PopupMenuItem(value: 'edit', child: Text('Edit details')),
                   PopupMenuItem(
@@ -256,13 +256,16 @@ class _PlaylistHeader extends StatelessWidget {
                 tooltip: 'Play playlist',
                 style: IconButton.styleFrom(
                   backgroundColor: theme.colorScheme.primary,
-                  foregroundColor: Colors.black,
+                  foregroundColor: theme.colorScheme.onPrimary,
                 ),
               ),
               gap12,
               IconButton(
                 onPressed: onShuffle,
-                icon: const Icon(Icons.shuffle, color: Colors.white),
+                icon: Icon(
+                  Icons.shuffle,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
                 tooltip: 'Shuffle',
               ),
             ],

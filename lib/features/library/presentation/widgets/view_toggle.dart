@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_colors.dart';
-
 /// A compact toggle to switch a library section between its view modes
 /// (e.g. list vs grid, 2-column vs 3-column grid).
 class ViewToggle<T> extends StatelessWidget {
@@ -40,7 +38,7 @@ class ViewToggle<T> extends StatelessWidget {
                   icon,
                   size: 18,
                   color: value == selected
-                      ? AppColors.accent
+                      ? theme.colorScheme.primary
                       : theme.colorScheme.onSurfaceVariant,
                 ),
               ),

@@ -2,8 +2,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../../core/constants/app_colors.dart';
-
 /// Animated 3-bar "equalizer" used to indicate that a song is currently
 /// playing. Falls back to a static state when [playing] is false.
 class EqualizerBars extends StatefulWidget {
@@ -11,12 +9,12 @@ class EqualizerBars extends StatefulWidget {
     super.key,
     this.playing = true,
     this.size = 16,
-    this.color = AppColors.accent,
+    this.color,
   });
 
   final bool playing;
   final double size;
-  final Color color;
+  final Color? color;
 
   @override
   State<EqualizerBars> createState() => _EqualizerBarsState();
@@ -55,6 +53,7 @@ class _EqualizerBarsState extends State<EqualizerBars>
 
   @override
   Widget build(BuildContext context) {
+    final color = widget.color ?? Theme.of(context).colorScheme.primary;
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, _) {
@@ -73,7 +72,7 @@ class _EqualizerBarsState extends State<EqualizerBars>
               height: height,
               margin: EdgeInsets.symmetric(horizontal: widget.size * 0.07),
               decoration: BoxDecoration(
-                color: widget.color,
+                color: color,
                 borderRadius: BorderRadius.circular(99),
               ),
             );

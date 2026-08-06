@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/utils/app_gaps.dart';
 import '../../../../core/utils/format_duration.dart';
+import '../../../../core/theme/theme_extension.dart';
 import '../../../../core/widgets/player_bottom_shell.dart';
 import '../../../../features/player/presentation/providers/player_providers.dart';
 import '../../../../shared/widgets/empty_state.dart';
@@ -95,8 +96,10 @@ class _AlbumDetailScreenState extends ConsumerState<AlbumDetailScreen> {
             SliverAppBar(
               pinned: true,
               expandedHeight: _expandedHeight,
-              backgroundColor: theme.colorScheme.surface,
+              backgroundColor:
+                  Color.lerp(context.appTheme.gradientStart, Colors.black, 0.4)!,
               surfaceTintColor: Colors.transparent,
+              iconTheme: const IconThemeData(color: Colors.white),
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back),
                 onPressed: () => Navigator.of(context).pop(),
@@ -259,7 +262,7 @@ class _AlbumHeader extends ConsumerWidget {
                         tooltip: 'Play album',
                         style: IconButton.styleFrom(
                           backgroundColor: theme.colorScheme.primary,
-                          foregroundColor: Colors.black,
+                          foregroundColor: theme.colorScheme.onPrimary,
                         ),
                       ),
                       gap12,

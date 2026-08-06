@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimens.dart';
 import '../../../core/utils/app_gaps.dart';
 import '../../../features/library/presentation/providers/library_index_provider.dart';
@@ -111,13 +110,13 @@ class _SearchFieldState extends State<_SearchField> {
         color: theme.colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: _focused ? AppColors.accent : Colors.transparent,
+          color: _focused ? theme.colorScheme.primary : Colors.transparent,
           width: 1.5,
         ),
       ),
       child: Row(
         children: [
-          Icon(Icons.search, color: AppColors.textSecondary),
+          Icon(Icons.search, color: theme.colorScheme.onSurfaceVariant),
           const SizedBox(width: 12),
           Expanded(
             child: TextField(
@@ -132,7 +131,7 @@ class _SearchFieldState extends State<_SearchField> {
                 border: InputBorder.none,
                 hintText: 'Qué quieres escuchar?',
                 hintStyle: theme.textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
                 isDense: true,
               ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/constants/app_colors.dart';
 import '../../core/utils/format_duration.dart';
 import '../../features/library/domain/entities/song.dart';
 import '../../features/library/presentation/widgets/cover_art.dart';
@@ -40,7 +39,7 @@ class SongListTile extends ConsumerWidget {
             ?.id ==
         song.id;
 
-    final accent = AppColors.accent;
+    final accent = theme.colorScheme.primary;
 
     final titleStyle = theme.textTheme.bodyLarge?.copyWith(
       fontWeight: FontWeight.w600,

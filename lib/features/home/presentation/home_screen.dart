@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimens.dart';
 import '../../../core/utils/app_gaps.dart';
 import '../../../features/library/domain/entities/song.dart';
@@ -59,7 +58,7 @@ class HomeScreen extends ConsumerWidget {
                           'Musicallz',
                           style: theme.textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.w800,
-                            color: AppColors.accent,
+                            color: theme.colorScheme.primary,
                           ),
                         ),
                       ),
@@ -70,7 +69,7 @@ class HomeScreen extends ConsumerWidget {
                   Text(
                     '${_greeting()}, tu música local te espera.',
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textSecondary,
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -114,15 +113,20 @@ class _Avatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       width: 36,
       height: 36,
       decoration: BoxDecoration(
-        color: AppColors.surfaceHigh,
+        color: theme.colorScheme.surfaceContainerHigh,
         shape: BoxShape.circle,
-        border: Border.all(color: Colors.white24),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
       ),
-      child: const Icon(Icons.person_outline, color: Colors.white, size: 20),
+      child: Icon(
+        Icons.person_outline,
+        color: theme.colorScheme.onSurfaceVariant,
+        size: 20,
+      ),
     );
   }
 }
