@@ -14,23 +14,23 @@ Musicallz is designed for people who want full control over their music library 
 
 | Home | Now Playing | Queue |
 |:---:|:---:|:---:|
-| ![Home](screenshots/home.jpeg) | ![Now Playing](screenshots/playing.jpeg) | ![Queue](screenshots/queue.jpeg) |
+| <img src="screenshots/home.jpeg" width="250"> | <img src="screenshots/playing.jpeg" width="250"> | <img src="screenshots/queue.jpeg" width="250"> |
 
 | Search | Search results | Settings |
 |:---:|:---:|:---:|
-| ![Search](screenshots/search.jpeg) | ![Searching](screenshots/searching.jpeg) | ![Settings](screenshots/settings.jpeg) |
+| <img src="screenshots/search.jpeg" width="250"> | <img src="screenshots/searching.jpeg" width="250"> | <img src="screenshots/settings.jpeg" width="250"> |
 
 | Playlists | Albums | Artists |
 |:---:|:---:|:---:|
-| ![Library Playlists](screenshots/library-playlists.jpeg) | ![Library Albums](screenshots/library-albums.jpeg) | ![Library Artists](screenshots/library-artists.jpeg) |
+| <img src="screenshots/library-playlists.jpeg" width="250"> | <img src="screenshots/library-albums.jpeg" width="250"> | <img src="screenshots/library-artists.jpeg" width="250"> |
 
 | Songs | Artist screen | Media notification |
 |:---:|:---:|:---:|
-| ![Library Songs](screenshots/library-songs.jpeg) | ![Artist screen](screenshots/artist-screen.jpeg) | ![Notification island](screenshots/notification-island.jpeg) |
+| <img src="screenshots/library-songs.jpeg" width="250"> | <img src="screenshots/artist-screen.jpeg" width="250"> | <img src="screenshots/notification-island.jpeg" width="250"> |
 
 | Notification with controls |
 |:---:|
-| ![Notification island controls](screenshots/notification-island-control.jpeg) |
+| <img src="screenshots/notification-island-control.jpeg" width="250"> |
 
 </div>
 
