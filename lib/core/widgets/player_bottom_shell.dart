@@ -28,12 +28,19 @@ class PlayerBottomShell extends StatelessWidget {
         if (didPop || router == null) return;
         router.go('/library');
       },
-      child: Column(
-        children: [
-          Expanded(child: child),
-          const MiniPlayer(),
-          AppBottomBar(),
-        ],
+      // The Scaffold places AppBottomBar in the bottomNavigationBar slot so
+      // the NavigationBar renders at its base height (the Scaffold strips the
+      // system bottom padding there). Putting it in a plain Column would let
+      // the NavigationBar absorb the system inset and push the MiniPlayer up,
+      // leaving a gap on detail screens.
+      child: Scaffold(
+        body: Column(
+          children: [
+            Expanded(child: child),
+            const MiniPlayer(),
+          ],
+        ),
+        bottomNavigationBar: AppBottomBar(),
       ),
     );
   }

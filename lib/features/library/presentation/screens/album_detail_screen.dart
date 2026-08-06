@@ -13,16 +13,53 @@ import '../providers/album_favorites_provider.dart';
 import '../providers/library_index_provider.dart';
 import '../widgets/cover_art.dart';
 
-class AlbumDetailScreen extends ConsumerWidget {
+class AlbumDetailScreen extends ConsumerStatefulWidget {
   const AlbumDetailScreen({super.key, required this.albumId});
 
   final String albumId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AlbumDetailScreen> createState() => _AlbumDetailScreenState();
+}
+
+class _AlbumDetailScreenState extends ConsumerState<AlbumDetailScreen> {
+  final GlobalKey _headerContentKey = GlobalKey();
+  double _expandedHeight = 440;
+  bool _measureScheduled = false;
+
+  // The header content (cover, texts, play row) has a variable height because
+  // the album title can wrap to two lines. A fixed expandedHeight either clips
+  // the play row on long titles or leaves a big empty gap below it on short
+  // ones. Measuring the content after layout lets the SliverAppBar match it,
+  // so the play row lands just above the app bar bottom edge and the songs
+  // list starts right after it. The SliverAppBar already includes the status
+  // bar inset on top, so only the content height plus the top padding and a
+  // small margin are needed.
+  void _measureHeader() {
+    final ctx = _headerContentKey.currentContext;
+    if (ctx == null || !ctx.mounted) return;
+    final height = ctx.size?.height;
+    if (height == null || height <= 0) return;
+    final target = height + AppDimens.pagePadding + 8;
+    if ((target - _expandedHeight).abs() > 0.5) {
+      setState(() => _expandedHeight = target);
+    }
+  }
+
+  void _scheduleHeaderMeasure() {
+    if (_measureScheduled) return;
+    _measureScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _measureScheduled = false;
+      _measureHeader();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final album = ref.watch(albumProvider(albumId));
-    final songs = ref.watch(albumSongsProvider(albumId));
+    final album = ref.watch(albumProvider(widget.albumId));
+    final songs = ref.watch(albumSongsProvider(widget.albumId));
 
     if (album == null) {
       return PlayerBottomShell(
@@ -36,6 +73,8 @@ class AlbumDetailScreen extends ConsumerWidget {
         ),
       );
     }
+
+    _scheduleHeaderMeasure();
 
     final totalDuration = songs.fold<Duration>(
       Duration.zero,
@@ -55,7 +94,7 @@ class AlbumDetailScreen extends ConsumerWidget {
           slivers: [
             SliverAppBar(
               pinned: true,
-              expandedHeight: 340,
+              expandedHeight: _expandedHeight,
               backgroundColor: theme.colorScheme.surface,
               surfaceTintColor: Colors.transparent,
               leading: IconButton(
@@ -64,6 +103,7 @@ class AlbumDetailScreen extends ConsumerWidget {
               ),
               flexibleSpace: FlexibleSpaceBar(
                 background: _AlbumHeader(
+                  contentKey: _headerContentKey,
                   album: album,
                   totalDuration: totalDuration,
                   onPlay: () => ref.read(playerControllerProvider.notifier)
@@ -111,12 +151,14 @@ class AlbumDetailScreen extends ConsumerWidget {
 /// The detail header uses the full gradient overlay plus the cover art.
 class _AlbumHeader extends ConsumerWidget {
   const _AlbumHeader({
+    required this.contentKey,
     required this.album,
     required this.totalDuration,
     required this.onPlay,
     required this.heroImage,
   });
 
+  final Key contentKey;
   final Album album;
   final Duration totalDuration;
   final VoidCallback onPlay;
@@ -161,6 +203,7 @@ class _AlbumHeader extends ConsumerWidget {
                 16,
               ),
               child: Column(
+                key: contentKey,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
