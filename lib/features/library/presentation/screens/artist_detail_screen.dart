@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/utils/app_gaps.dart';
+import '../../../../core/widgets/player_bottom_shell.dart';
 import '../../../../features/player/presentation/providers/player_providers.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/section_header.dart';
@@ -11,7 +12,9 @@ import '../../../../shared/widgets/song_list_tile.dart';
 import '../../domain/entities/album.dart';
 import '../../domain/entities/artist.dart';
 import '../../domain/entities/song.dart';
+import '../providers/artist_favorites_provider.dart';
 import '../providers/library_index_provider.dart';
+import '../widgets/cover_art.dart';
 
 class ArtistDetailScreen extends ConsumerWidget {
   const ArtistDetailScreen({super.key, required this.artistId});
@@ -25,12 +28,14 @@ class ArtistDetailScreen extends ConsumerWidget {
     final songs = ref.watch(artistSongsProvider(artistId));
 
     if (artist == null) {
-      return Scaffold(
-        appBar: AppBar(),
-        body: const EmptyState(
-          icon: Icons.person_off_outlined,
-          title: 'Artist not found',
-          message: 'This artist is no longer available in your library.',
+      return PlayerBottomShell(
+        child: Scaffold(
+          appBar: AppBar(),
+          body: const EmptyState(
+            icon: Icons.person_off_outlined,
+            title: 'Artist not found',
+            message: 'This artist is no longer available in your library.',
+          ),
         ),
       );
     }
@@ -41,54 +46,58 @@ class ArtistDetailScreen extends ConsumerWidget {
         ref.watch(libraryIndexProvider)?.albumsForArtist(artistId) ??
             const <Album>[];
 
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            pinned: true,
-            expandedHeight: 380,
-            backgroundColor: theme.colorScheme.surface,
-            surfaceTintColor: Colors.transparent,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            flexibleSpace: FlexibleSpaceBar(
-              background: _ArtistHeader(
-                artist: artist,
-                onPlay: () => ref.read(playerControllerProvider.notifier)
-                    .playQueue(songs),
+    return PlayerBottomShell(
+      child: Scaffold(
+        body: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              pinned: true,
+              expandedHeight: 320,
+              backgroundColor: theme.colorScheme.surface,
+              surfaceTintColor: Colors.transparent,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              flexibleSpace: FlexibleSpaceBar(
+                background: _ArtistHeader(
+                  artist: artist,
+                  onPlay: () => ref.read(playerControllerProvider.notifier)
+                      .playQueue(songs),
+                ),
               ),
             ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppDimens.pagePadding,
-                vertical: 16,
-              ),
-              child: _SongGroups(
-                songs: songs,
-                albums: orderedAlbums,
-                fullQueue: songs,
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimens.pagePadding,
+                  vertical: 16,
+                ),
+                child: _SongGroups(
+                  songs: songs,
+                  albums: orderedAlbums,
+                  fullQueue: songs,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
-class _ArtistHeader extends StatelessWidget {
+class _ArtistHeader extends ConsumerWidget {
   const _ArtistHeader({required this.artist, required this.onPlay});
 
   final Artist artist;
   final VoidCallback onPlay;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final followed =
+        ref.watch(artistFavoritesProvider).contains(artist.id);
     return Stack(
       fit: StackFit.expand,
       children: [
@@ -115,12 +124,30 @@ class _ArtistHeader extends StatelessWidget {
                 AppDimens.pagePadding,
                 AppDimens.pagePadding,
                 AppDimens.pagePadding,
-                40,
+                16,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  // Circular artist avatar, bigger and centered. TweenAnimationBuilder
+                  // gives a gentle entrance without Hero/IndexedStack clashes.
+                  TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0.9, end: 1),
+                    duration: const Duration(milliseconds: 450),
+                    curve: Curves.easeOutCubic,
+                    builder: (context, value, child) =>
+                        Opacity(opacity: value, child: Transform.scale(scale: value, child: child)),
+                    child: CoverArt(
+                      bytes: artist.coverArt,
+                      filePath: artist.coverArtPath,
+                      size: 140,
+                      radius: 70,
+                      icon: Icons.person,
+                      circular: true,
+                    ),
+                  ),
+                  gap16,
                   Text(
                     artist.name,
                     maxLines: 1,
@@ -164,10 +191,14 @@ class _ArtistHeader extends StatelessWidget {
                       ),
                       gap12,
                       IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.favorite_border,
-                            color: Colors.white),
-                        tooltip: 'Follow artist',
+                        onPressed: () => ref
+                            .read(artistFavoritesProvider.notifier)
+                            .toggle(artist.id),
+                        icon: Icon(
+                          followed ? Icons.check : Icons.person_add_alt_1,
+                          color: followed ? AppColors.accent : Colors.white,
+                        ),
+                        tooltip: followed ? 'Following' : 'Follow artist',
                       ),
                     ],
                   ),

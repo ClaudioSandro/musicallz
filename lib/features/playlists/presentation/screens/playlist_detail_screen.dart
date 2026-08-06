@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/format_duration.dart';
 import '../../../../core/utils/app_gaps.dart';
+import '../../../../core/widgets/player_bottom_shell.dart';
 import '../../../library/domain/entities/song.dart';
 import '../../../library/presentation/widgets/cover_art.dart';
 import '../../../player/presentation/providers/player_providers.dart';
@@ -27,12 +28,14 @@ class PlaylistDetailScreen extends ConsumerWidget {
     final repo = ref.read(playlistRepositoryProvider);
 
     if (playlist == null) {
-      return Scaffold(
-        appBar: AppBar(),
-        body: const EmptyState(
-          icon: Icons.queue_music,
-          title: 'Playlist not found',
-          message: 'This playlist was deleted.',
+      return PlayerBottomShell(
+        child: Scaffold(
+          appBar: AppBar(),
+          body: const EmptyState(
+            icon: Icons.queue_music,
+            title: 'Playlist not found',
+            message: 'This playlist was deleted.',
+          ),
         ),
       );
     }
@@ -43,105 +46,107 @@ class PlaylistDetailScreen extends ConsumerWidget {
       (acc, song) => acc + song.duration,
     );
 
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _PlaylistHeader(
-              playlist: playlist,
-              count: songs.length,
-              totalDuration: totalDuration,
-              onPlay: () => ref
-                  .read(playerControllerProvider.notifier)
-                  .playQueue(songs),
-              onShuffle: () async {
-                final ctrl =
-                    ref.read(playerControllerProvider.notifier);
-                await ctrl.applyAudioShuffle(true);
-                await ctrl.playQueue(songs);
-              },
-              onEdit: () async {
-                final draft = await showPlaylistDialog(
-                  context,
-                  title: 'Edit Playlist',
-                  confirmLabel: 'Save',
-                  initialName: playlist.name,
-                  initialDescription: playlist.description ?? '',
-                );
-                if (draft == null || !context.mounted) return;
-                await repo.renamePlaylist(playlist.id, draft.name);
-                await repo.updateDescription(
-                  playlist.id,
-                  draft.description.isEmpty
-                      ? null
-                      : draft.description,
-                );
-              },
-              onDelete: () async {
-                final confirmed = await showDialog<bool>(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    backgroundColor: AppColors.surface,
-                    title: const Text('Delete playlist?'),
-                    content: Text(
-                      '"${playlist.name}" and its play order will be '
-                      'removed. Your songs are not affected.',
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(false),
-                        child: const Text('Cancel'),
+    return PlayerBottomShell(
+      child: Scaffold(
+        body: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _PlaylistHeader(
+                playlist: playlist,
+                count: songs.length,
+                totalDuration: totalDuration,
+                onPlay: () => ref
+                    .read(playerControllerProvider.notifier)
+                    .playQueue(songs),
+                onShuffle: () async {
+                  final ctrl =
+                      ref.read(playerControllerProvider.notifier);
+                  await ctrl.applyAudioShuffle(true);
+                  await ctrl.playQueue(songs);
+                },
+                onEdit: () async {
+                  final draft = await showPlaylistDialog(
+                    context,
+                    title: 'Edit Playlist',
+                    confirmLabel: 'Save',
+                    initialName: playlist.name,
+                    initialDescription: playlist.description ?? '',
+                  );
+                  if (draft == null || !context.mounted) return;
+                  await repo.renamePlaylist(playlist.id, draft.name);
+                  await repo.updateDescription(
+                    playlist.id,
+                    draft.description.isEmpty
+                        ? null
+                        : draft.description,
+                  );
+                },
+                onDelete: () async {
+                  final confirmed = await showDialog<bool>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      backgroundColor: AppColors.surface,
+                      title: const Text('Delete playlist?'),
+                      content: Text(
+                        '"${playlist.name}" and its play order will be '
+                        'removed. Your songs are not affected.',
                       ),
-                      FilledButton(
-                        onPressed: () => Navigator.of(context).pop(true),
-                        style: FilledButton.styleFrom(
-                          backgroundColor: Colors.redAccent,
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(false),
+                          child: const Text('Cancel'),
                         ),
-                        child: const Text('Delete'),
-                      ),
-                    ],
-                  ),
-                );
-                if (confirmed != true || !context.mounted) return;
-                await repo.deletePlaylist(playlist.id);
-                if (context.mounted) Navigator.of(context).pop();
-              },
-            ),
-            const Divider(height: 1, color: Colors.white12),
-            Expanded(
-              child: songs.isEmpty
-                  ? const EmptyState(
-                      icon: Icons.queue_music,
-                      title: 'No songs yet',
-                      message: 'Use "Add to playlist" on any song to fill '
-                          'this playlist.',
-                    )
-                  : ReorderableListView.builder(
-                      padding:
-                          const EdgeInsets.only(bottom: 24),
-                      buildDefaultDragHandles: false,
-                      onReorder: (oldIndex, newIndex) {
-                        if (newIndex > oldIndex) newIndex -= 1;
-                        repo.moveSong(playlist.id, oldIndex, newIndex);
-                      },
-                      itemCount: songs.length,
-                      itemBuilder: (context, index) {
-                        final song = songs[index];
-                        return _PlaylistSongTile(
-                          key: ValueKey(song.id),
-                          song: song,
-                          index: index,
-                          playlist: playlist,
-                          queue: songs,
-                          onTap: () => ref
-                              .read(playerControllerProvider.notifier)
-                              .playQueue(songs, startIndex: index),
-                        );
-                      },
+                        FilledButton(
+                          onPressed: () => Navigator.of(context).pop(true),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: Colors.redAccent,
+                          ),
+                          child: const Text('Delete'),
+                        ),
+                      ],
                     ),
-            ),
-          ],
+                  );
+                  if (confirmed != true || !context.mounted) return;
+                  await repo.deletePlaylist(playlist.id);
+                  if (context.mounted) Navigator.of(context).pop();
+                },
+              ),
+              const Divider(height: 1, color: Colors.white12),
+              Expanded(
+                child: songs.isEmpty
+                    ? const EmptyState(
+                        icon: Icons.queue_music,
+                        title: 'No songs yet',
+                        message: 'Use "Add to playlist" on any song to fill '
+                            'this playlist.',
+                      )
+                    : ReorderableListView.builder(
+                        padding:
+                            const EdgeInsets.only(bottom: 24),
+                        buildDefaultDragHandles: false,
+                        onReorder: (oldIndex, newIndex) {
+                          if (newIndex > oldIndex) newIndex -= 1;
+                          repo.moveSong(playlist.id, oldIndex, newIndex);
+                        },
+                        itemCount: songs.length,
+                        itemBuilder: (context, index) {
+                          final song = songs[index];
+                          return _PlaylistSongTile(
+                            key: ValueKey(song.id),
+                            song: song,
+                            index: index,
+                            playlist: playlist,
+                            queue: songs,
+                            onTap: () => ref
+                                .read(playerControllerProvider.notifier)
+                                .playQueue(songs, startIndex: index),
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -32,14 +32,23 @@ class MiniPlayer extends ConsumerWidget {
         onTap: () => context.push('/now-playing'),
         child: Column(
           children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              height: 2,
+            // Live progress bar. The fraction comes from the player position
+            // stream (clamped to [0,1]) and is tweened so it fills smoothly
+            // instead of jumping between stream ticks.
+            Container(
+              height: 3,
               width: double.infinity,
               color: AppColors.surfaceHigh,
               alignment: Alignment.centerLeft,
-              child: FractionallySizedBox(
-                widthFactor: fraction,
+              child: TweenAnimationBuilder<double>(
+                tween: Tween<double>(begin: fraction, end: fraction),
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.linear,
+                builder: (context, value, child) => FractionallySizedBox(
+                  alignment: Alignment.centerLeft,
+                  widthFactor: value,
+                  child: child,
+                ),
                 child: const ColoredBox(color: AppColors.accent),
               ),
             ),

@@ -20,7 +20,7 @@ class MusicallAudioHandler extends BaseAudioHandler {
       player.playingStream.listen((_) => _broadcastState()),
       player.playerStateStream.listen((_) => _broadcastState()),
       player.positionStream.listen((_) => _broadcastState()),
-      player.durationStream.listen((_) => _broadcastState()),
+      player.durationStream.listen(_onDurationChanged),
     ]);
     _configureSession();
   }
@@ -62,17 +62,28 @@ class MusicallAudioHandler extends BaseAudioHandler {
 
   void _onIndexChanged(int? index) {
     if (index == null || index < 0) return;
+    _queueIndex = index;
     final seq = _player.sequence;
-    if (seq == null || index >= seq.length) return;
-    final tag = seq[index].tag;
-    if (tag is Song) {
-      final item = _mediaItemFor(tag);
-      if (mediaItem.valueOrNull?.id != item.id) {
-        mediaItem.add(item);
+    if (seq != null && index < seq.length) {
+      final tag = seq[index].tag;
+      if (tag is Song) {
+        // Always republish the item: when the same song is re-queued or a
+        // track loops, the id matches the previous one but the notification
+        // must still refresh title/art/duration.
+        mediaItem.add(_mediaItemFor(tag));
       }
     }
-    _queueIndex = index;
     _broadcastState();
+  }
+
+  /// Refreshes the current [MediaItem] duration once just_audio resolves the
+  /// real file duration, so the notification never shows a stale/zero length.
+  void _onDurationChanged(Duration? duration) {
+    if (duration == null) return;
+    final current = mediaItem.valueOrNull;
+    if (current == null || duration <= Duration.zero) return;
+    if (current.duration == duration) return;
+    mediaItem.add(current.copyWith(duration: duration));
   }
 
   /// Called by [PlayerController] whenever a new queue is loaded so the OS

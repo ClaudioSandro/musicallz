@@ -27,7 +27,12 @@ class CoverArt extends StatelessWidget {
     final child = SizedBox.square(
       dimension: size,
       child: bytes != null
-          ? Image.memory(bytes!, fit: BoxFit.cover)
+          ? Image.memory(
+              bytes!,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) =>
+                  _placeholder(color),
+            )
           : filePath != null
               ? Image.file(
                   File(filePath!),

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -171,20 +173,29 @@ class _MiniCover extends ConsumerWidget {
         .map((id) => map[id]?.albumArt)
         .where((art) => art != null)
         .firstOrNull;
+    final coverPath = forPlaylist.songIds
+        .map((id) => map[id]?.albumArtPath)
+        .whereType<String>()
+        .firstOrNull;
+    Widget? image;
+    if (coverBytes != null) {
+      image = Image.memory(coverBytes, fit: BoxFit.cover);
+    } else if (coverPath != null && File(coverPath).existsSync()) {
+      image = Image.file(File(coverPath), fit: BoxFit.cover);
+    }
     return ClipRRect(
       borderRadius: BorderRadius.circular(6),
       child: SizedBox.square(
         dimension: 44,
-        child: coverBytes != null
-            ? Image.memory(coverBytes, fit: BoxFit.cover)
-            : ColoredBox(
-                color: themeColor(context),
-                child: Icon(
-                  Icons.queue_music,
-                  size: 20,
-                  color: Colors.white.withValues(alpha: 0.6),
-                ),
+        child: image ??
+            ColoredBox(
+              color: themeColor(context),
+              child: Icon(
+                Icons.queue_music,
+                size: 20,
+                color: Colors.white.withValues(alpha: 0.6),
               ),
+            ),
       ),
     );
   }

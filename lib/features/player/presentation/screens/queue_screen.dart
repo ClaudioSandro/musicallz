@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/format_duration.dart';
+import '../../../../core/widgets/player_bottom_shell.dart';
 import '../../../../features/library/domain/entities/song.dart';
 import '../../../../features/library/presentation/widgets/cover_art.dart';
 import '../../../../shared/widgets/empty_state.dart';
@@ -20,12 +21,14 @@ class QueueScreen extends ConsumerWidget {
     final current = ref.watch(currentSongProvider);
 
     if (current == null) {
-      return Scaffold(
-        appBar: AppBar(),
-        body: const EmptyState(
-          icon: Icons.queue_music,
-          title: 'Nothing playing',
-          message: 'Start playing a song and its queue will show up here.',
+      return PlayerBottomShell(
+        child: Scaffold(
+          appBar: AppBar(),
+          body: const EmptyState(
+            icon: Icons.queue_music,
+            title: 'Nothing playing',
+            message: 'Start playing a song and its queue will show up here.',
+          ),
         ),
       );
     }
@@ -33,65 +36,67 @@ class QueueScreen extends ConsumerWidget {
     final upcoming = ref.watch(upcomingQueueProvider);
     final currentIndex = ref.watch(currentIndexProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () => Navigator.of(context).pop(),
-          icon: const Icon(Icons.arrow_back),
-          tooltip: 'Back',
+    return PlayerBottomShell(
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            onPressed: () => Navigator.of(context).pop(),
+            icon: const Icon(Icons.arrow_back),
+            tooltip: 'Back',
+          ),
+          title: const Text('Queue', style: TextStyle(fontWeight: FontWeight.w700)),
         ),
-        title: const Text('Queue', style: TextStyle(fontWeight: FontWeight.w700)),
-      ),
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const _SectionLabel('NOW PLAYING'),
-            _CurrentRow(song: current, index: currentIndex),
-            const Divider(height: 24, color: Colors.white12),
-            _SectionLabel(
-              upcoming.isEmpty ? 'UP NEXT · EMPTY' : 'UP NEXT · ${upcoming.length}',
-            ),
-            if (upcoming.isEmpty)
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                child: Text(
-                  'Nothing next in the queue. Use "Play next" or "Add to queue" '
-                  'on any song to build it.',
-                  style: TextStyle(color: Colors.white60),
-                ),
-              )
-            else
-              Expanded(
-                child: ReorderableListView.builder(
-                  padding: const EdgeInsets.only(bottom: 24),
-                  buildDefaultDragHandles: false,
-                  onReorder: (oldIndex, newIndex) {
-                    if (newIndex > oldIndex) newIndex -= 1;
-                    final from = currentIndex + 1 + oldIndex;
-                    final to = currentIndex + 1 + newIndex;
-                    ref.read(playerControllerProvider.notifier)
-                        .reorderQueue(from, to);
-                  },
-                  itemCount: upcoming.length,
-                  itemBuilder: (context, i) {
-                    final song = upcoming[i];
-                    final queueIndex = currentIndex + 1 + i;
-                    return _UpcomingRow(
-                      key: ValueKey(song.id),
-                      song: song,
-                      index: i,
-                      onTap: () => ref
-                          .read(playerControllerProvider.notifier)
-                          .skipToIndex(queueIndex),
-                      onRemove: () => ref
-                          .read(playerControllerProvider.notifier)
-                          .removeFromQueue(queueIndex),
-                    );
-                  },
-                ),
+        body: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const _SectionLabel('NOW PLAYING'),
+              _CurrentRow(song: current, index: currentIndex),
+              const Divider(height: 24, color: Colors.white12),
+              _SectionLabel(
+                upcoming.isEmpty ? 'UP NEXT · EMPTY' : 'UP NEXT · ${upcoming.length}',
               ),
-          ],
+              if (upcoming.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  child: Text(
+                    'Nothing next in the queue. Use "Play next" or "Add to queue" '
+                    'on any song to build it.',
+                    style: TextStyle(color: Colors.white60),
+                  ),
+                )
+              else
+                Expanded(
+                  child: ReorderableListView.builder(
+                    padding: const EdgeInsets.only(bottom: 24),
+                    buildDefaultDragHandles: false,
+                    onReorder: (oldIndex, newIndex) {
+                      if (newIndex > oldIndex) newIndex -= 1;
+                      final from = currentIndex + 1 + oldIndex;
+                      final to = currentIndex + 1 + newIndex;
+                      ref.read(playerControllerProvider.notifier)
+                          .reorderQueue(from, to);
+                    },
+                    itemCount: upcoming.length,
+                    itemBuilder: (context, i) {
+                      final song = upcoming[i];
+                      final queueIndex = currentIndex + 1 + i;
+                      return _UpcomingRow(
+                        key: ValueKey(song.id),
+                        song: song,
+                        index: i,
+                        onTap: () => ref
+                            .read(playerControllerProvider.notifier)
+                            .skipToIndex(queueIndex),
+                        onRemove: () => ref
+                            .read(playerControllerProvider.notifier)
+                            .removeFromQueue(queueIndex),
+                      );
+                    },
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

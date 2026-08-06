@@ -135,7 +135,12 @@ class _SongContextMenu extends ConsumerWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: CoverArt(bytes: song.albumArt, size: 56, radius: 8),
+                  child: CoverArt(
+                    bytes: song.albumArt,
+                    filePath: song.albumArtPath,
+                    size: 56,
+                    radius: 8,
+                  ),
                 ),
                 Expanded(
                   child: Column(

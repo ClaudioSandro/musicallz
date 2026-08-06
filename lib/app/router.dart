@@ -16,6 +16,32 @@ import '../features/settings/presentation/settings_screen.dart';
 
 final rootNavigatorKey = GlobalKey<NavigatorState>();
 
+/// Fade + subtle slide used for detail routes. Gentler than the default
+/// Material zoom so pushing an album/artist/playlist feels like a soft
+/// "expand" without Hero tags (which clash across IndexedStack branches).
+Page<void> _softTransition(Widget child) => CustomTransitionPage<void>(
+      transitionDuration: const Duration(milliseconds: 280),
+      reverseTransitionDuration: const Duration(milliseconds: 220),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        final curved = CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeOutCubic,
+          reverseCurve: Curves.easeInCubic,
+        );
+        return FadeTransition(
+          opacity: curved,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, 0.03),
+              end: Offset.zero,
+            ).animate(curved),
+            child: child,
+          ),
+        );
+      },
+      child: child,
+    );
+
 final appRouter = GoRouter(
   navigatorKey: rootNavigatorKey,
   initialLocation: '/home',
@@ -66,45 +92,56 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/artist/:artistId',
       name: 'artist',
-      builder: (context, state) => ArtistDetailScreen(
-        artistId: state.pathParameters['artistId']!,
+      pageBuilder: (context, state) => _softTransition(
+        ArtistDetailScreen(
+          artistId: state.pathParameters['artistId']!,
+        ),
       ),
     ),
     GoRoute(
       path: '/album/:albumId',
       name: 'album',
-      builder: (context, state) => AlbumDetailScreen(
-        albumId: state.pathParameters['albumId']!,
+      pageBuilder: (context, state) => _softTransition(
+        AlbumDetailScreen(
+          albumId: state.pathParameters['albumId']!,
+        ),
       ),
     ),
     GoRoute(
       path: '/now-playing',
       name: 'now-playing',
-      builder: (context, state) => const NowPlayingScreen(),
+      pageBuilder: (context, state) =>
+          _softTransition(const NowPlayingScreen()),
     ),
     GoRoute(
       path: '/queue',
       name: 'queue',
-      builder: (context, state) => const QueueScreen(),
+      pageBuilder: (context, state) =>
+          _softTransition(const QueueScreen()),
     ),
     GoRoute(
       path: '/playlist/:playlistId',
       name: 'playlist',
-      builder: (context, state) => PlaylistDetailScreen(
-        playlistId: int.parse(state.pathParameters['playlistId']!),
+      pageBuilder: (context, state) => _softTransition(
+        PlaylistDetailScreen(
+          playlistId: int.parse(state.pathParameters['playlistId']!),
+        ),
       ),
     ),
     GoRoute(
       path: '/liked-songs',
       name: 'liked-songs',
-      builder: (context, state) => const LikedSongsScreen(),
+      pageBuilder: (context, state) =>
+          _softTransition(const LikedSongsScreen()),
     ),
     GoRoute(
       path: '/genre/:genreName',
       name: 'genre',
-      builder: (context, state) => GenreDetailScreen(
-        genreName:
-            Uri.decodeComponent(state.pathParameters['genreName']!),
+      pageBuilder: (context, state) => _softTransition(
+        GenreDetailScreen(
+          genreName:
+              Uri.decodeComponent(state.pathParameters['genreName']!),
+        ),
       ),
     ),
   ],

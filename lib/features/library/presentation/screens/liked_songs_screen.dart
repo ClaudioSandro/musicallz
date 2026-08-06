@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/app_gaps.dart';
+import '../../../../core/widgets/player_bottom_shell.dart';
 import '../../../../features/playlists/presentation/providers/playlist_providers.dart';
 import '../../../../features/playlists/presentation/widgets/playlist_tile.dart'
     show formatPlaylistDuration;
@@ -25,64 +26,66 @@ class LikedSongsScreen extends ConsumerWidget {
       (acc, song) => acc + song.duration,
     );
 
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _LikedHeader(
-              count: songs.length,
-              totalDuration: totalDuration,
-              onPlay: () => ref
-                  .read(playerControllerProvider.notifier)
-                  .playQueue(sorted),
-              onShuffle: () async {
-                final ctrl = ref.read(playerControllerProvider.notifier);
-                await ctrl.applyAudioShuffle(true);
-                await ctrl.playQueue(sorted);
-              },
-              sortButton: SortMenuButton<SongsSort>(
-                options: const [
-                  (value: SongsSort.titleAsc, label: 'Título (A→Z)', icon: Icons.sort_by_alpha),
-                  (value: SongsSort.titleDesc, label: 'Título (Z→A)', icon: Icons.sort_by_alpha),
-                  (value: SongsSort.artistAsc, label: 'Artista', icon: Icons.person_outline),
-                  (value: SongsSort.albumAsc, label: 'Álbum', icon: Icons.album_outlined),
-                  (value: SongsSort.addedNew, label: 'Añadidas recientemente', icon: Icons.add_circle_outline),
-                  (value: SongsSort.addedOld, label: 'Añadidas hace más', icon: Icons.history),
-                  (value: SongsSort.yearNew, label: 'Año (nuevas)', icon: Icons.calendar_today_outlined),
-                  (value: SongsSort.yearOld, label: 'Año (viejas)', icon: Icons.calendar_today_outlined),
-                  (value: SongsSort.durationLong, label: 'Duración (más largas)', icon: Icons.timer_outlined),
-                  (value: SongsSort.durationShort, label: 'Duración (más cortas)', icon: Icons.timer_outlined),
-                  (value: SongsSort.mostPlayed, label: 'Más reproducidas', icon: Icons.trending_up),
-                ],
-                selected: prefs.likedSort,
-                onSelected: (v) =>
-                    ref.read(libraryPrefsProvider.notifier).setLikedSort(v),
+    return PlayerBottomShell(
+      child: Scaffold(
+        body: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _LikedHeader(
+                count: songs.length,
+                totalDuration: totalDuration,
+                onPlay: () => ref
+                    .read(playerControllerProvider.notifier)
+                    .playQueue(sorted),
+                onShuffle: () async {
+                  final ctrl = ref.read(playerControllerProvider.notifier);
+                  await ctrl.applyAudioShuffle(true);
+                  await ctrl.playQueue(sorted);
+                },
+                sortButton: SortMenuButton<SongsSort>(
+                  options: const [
+                    (value: SongsSort.titleAsc, label: 'Título (A→Z)', icon: Icons.sort_by_alpha),
+                    (value: SongsSort.titleDesc, label: 'Título (Z→A)', icon: Icons.sort_by_alpha),
+                    (value: SongsSort.artistAsc, label: 'Artista', icon: Icons.person_outline),
+                    (value: SongsSort.albumAsc, label: 'Álbum', icon: Icons.album_outlined),
+                    (value: SongsSort.addedNew, label: 'Añadidas recientemente', icon: Icons.add_circle_outline),
+                    (value: SongsSort.addedOld, label: 'Añadidas hace más', icon: Icons.history),
+                    (value: SongsSort.yearNew, label: 'Año (nuevas)', icon: Icons.calendar_today_outlined),
+                    (value: SongsSort.yearOld, label: 'Año (viejas)', icon: Icons.calendar_today_outlined),
+                    (value: SongsSort.durationLong, label: 'Duración (más largas)', icon: Icons.timer_outlined),
+                    (value: SongsSort.durationShort, label: 'Duración (más cortas)', icon: Icons.timer_outlined),
+                    (value: SongsSort.mostPlayed, label: 'Más reproducidas', icon: Icons.trending_up),
+                  ],
+                  selected: prefs.likedSort,
+                  onSelected: (v) =>
+                      ref.read(libraryPrefsProvider.notifier).setLikedSort(v),
+                ),
               ),
-            ),
-            const Divider(height: 1, color: Colors.white12),
-            Expanded(
-              child: songs.isEmpty
-                  ? const EmptyState(
-                      icon: Icons.favorite_border,
-                      title: 'No Liked Songs yet',
-                      message: 'Tap the heart on any song to save it here.',
-                    )
-                  : ListView.builder(
-                      itemCount: sorted.length,
-                      itemBuilder: (context, index) {
-                        final song = sorted[index];
-                        return SongListTile(
-                          song: song,
-                          queue: sorted,
-                          onTap: () => ref
-                              .read(playerControllerProvider.notifier)
-                              .playQueue(sorted, startIndex: index),
-                        );
-                      },
-                    ),
-            ),
-          ],
+              const Divider(height: 1, color: Colors.white12),
+              Expanded(
+                child: songs.isEmpty
+                    ? const EmptyState(
+                        icon: Icons.favorite_border,
+                        title: 'No Liked Songs yet',
+                        message: 'Tap the heart on any song to save it here.',
+                      )
+                    : ListView.builder(
+                        itemCount: sorted.length,
+                        itemBuilder: (context, index) {
+                          final song = sorted[index];
+                          return SongListTile(
+                            song: song,
+                            queue: sorted,
+                            onTap: () => ref
+                                .read(playerControllerProvider.notifier)
+                                .playQueue(sorted, startIndex: index),
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ),
         ),
       ),
     );
