@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../core/constants/app_colors.dart';
-
 /// A Spotify-like progress slider used by the Now Playing screen.
 ///
 /// It renders a thin rounded track with a fill and a small thumb that only
@@ -78,7 +76,7 @@ class _SeekBarState extends State<SeekBar> {
                   Container(
                     height: dragging ? 5 : 4,
                     decoration: BoxDecoration(
-                      color: AppColors.surfaceHigh,
+                      color: Colors.white24,
                       borderRadius: BorderRadius.circular(99),
                     ),
                   ),
@@ -87,7 +85,7 @@ class _SeekBarState extends State<SeekBar> {
                     child: Container(
                       height: dragging ? 5 : 4,
                       decoration: BoxDecoration(
-                        color: AppColors.accent,
+                        color: Theme.of(context).colorScheme.primary,
                         borderRadius: BorderRadius.circular(99),
                       ),
                     ),

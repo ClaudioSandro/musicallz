@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/constants/app_colors.dart';
 import '../../features/library/domain/entities/song.dart';
 import '../../features/library/presentation/widgets/cover_art.dart';
 import '../../features/player/presentation/providers/player_providers.dart';
@@ -28,7 +27,7 @@ Future<void> openSongContextMenu(
 }) {
   return showModalBottomSheet<void>(
     context: callerContext,
-    backgroundColor: AppColors.surface,
+    backgroundColor: Theme.of(callerContext).colorScheme.surfaceContainerLow,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
@@ -126,7 +125,10 @@ class _SongContextMenu extends ConsumerWidget {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.white24,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurfaceVariant
+                    .withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(99),
               ),
             ),
@@ -215,7 +217,7 @@ class _SongContextMenu extends ConsumerWidget {
               label: isFavorite
                   ? 'Remove from Liked Songs'
                   : 'Add to Liked Songs',
-              color: isFavorite ? AppColors.accent : null,
+              color: isFavorite ? theme.colorScheme.primary : null,
               onTap: () {
                 HapticFeedback.selectionClick();
                 favoritesRepo.toggle(song.id);

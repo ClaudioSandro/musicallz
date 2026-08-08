@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../core/theme/theme_extension.dart';
+
 class EmptyState extends StatelessWidget {
   const EmptyState({
     super.key,
@@ -27,7 +29,7 @@ class EmptyState extends StatelessWidget {
                 color: theme.colorScheme.surfaceContainerHigh,
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, size: 40, color: theme.colorScheme.primary),
+              child: Icon(icon, size: 40, color: context.brandAccent),
             ),
             const SizedBox(height: 16),
             Text(

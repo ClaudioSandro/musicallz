@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/constants/app_colors.dart';
 import '../../features/playlists/presentation/providers/playlist_providers.dart';
 
 /// A Spotify-style heart toggle. Green when the song is a favorite.
@@ -38,7 +37,7 @@ class FavoriteButton extends ConsumerWidget {
           key: ValueKey('fav-$isFavorite'),
           size: size,
           color: isFavorite
-              ? AppColors.accent
+              ? theme.colorScheme.primary
               : theme.colorScheme.onSurfaceVariant,
         ),
       ),

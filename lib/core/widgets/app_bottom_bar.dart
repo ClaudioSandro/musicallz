@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../constants/app_colors.dart';
 import '../constants/app_dimens.dart';
 
 /// Spotify-style bottom navigation bar.
@@ -34,7 +33,7 @@ class AppBottomBar extends StatelessWidget {
 
     return NavigationBar(
       height: AppDimens.navBarHeight,
-      backgroundColor: AppColors.surface,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       selectedIndex: index,
       onDestinationSelected: (i) {
         if (onDestinationSelected != null) {

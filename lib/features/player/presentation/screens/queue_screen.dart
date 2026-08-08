@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/constants/app_colors.dart';
+import '../../../../core/theme/theme_extension.dart';
 import '../../../../core/utils/format_duration.dart';
 import '../../../../core/widgets/player_bottom_shell.dart';
 import '../../../../features/library/domain/entities/song.dart';
@@ -52,17 +52,19 @@ class QueueScreen extends ConsumerWidget {
             children: [
               const _SectionLabel('NOW PLAYING'),
               _CurrentRow(song: current, index: currentIndex),
-              const Divider(height: 24, color: Colors.white12),
+              const Divider(height: 24),
               _SectionLabel(
                 upcoming.isEmpty ? 'UP NEXT · EMPTY' : 'UP NEXT · ${upcoming.length}',
               ),
               if (upcoming.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                   child: Text(
                     'Nothing next in the queue. Use "Play next" or "Add to queue" '
                     'on any song to build it.',
-                    style: TextStyle(color: Colors.white60),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 )
               else
@@ -114,11 +116,11 @@ class _SectionLabel extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
       child: Text(
         label,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w700,
           letterSpacing: 2,
-          color: AppColors.textSecondary,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
         ),
       ),
     );
@@ -133,6 +135,7 @@ class _CurrentRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final playing = ref.watch(isPlayingProvider);
     return ListTile(
       leading: CoverArt(
@@ -145,8 +148,8 @@ class _CurrentRow extends ConsumerWidget {
         song.title,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: const TextStyle(
-          color: AppColors.accent,
+        style: TextStyle(
+          color: context.brandAccent,
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -154,7 +157,7 @@ class _CurrentRow extends ConsumerWidget {
         song.artist,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: const TextStyle(color: AppColors.textSecondary),
+        style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
       ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
@@ -165,12 +168,15 @@ class _CurrentRow extends ConsumerWidget {
           ],
           Text(
             formatDuration(song.duration),
-            style: const TextStyle(color: AppColors.textSecondary),
+            style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
           ),
           const SizedBox(width: 8),
           IconButton(
             onPressed: () => HapticFeedback.lightImpact(),
-            icon: const Icon(Icons.more_horiz, color: AppColors.textSecondary),
+            icon: Icon(
+              Icons.more_horiz,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
             tooltip: 'Current song',
           ),
         ],

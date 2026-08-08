@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimens.dart';
+import '../../../core/theme/theme_extension.dart';
 import '../../../core/utils/app_gaps.dart';
 import '../../../features/library/presentation/providers/music_library_provider.dart';
 import '../../../shared/widgets/rounded_card.dart';
@@ -33,20 +34,42 @@ class SettingsScreen extends StatelessWidget {
             gap24,
             const SectionHeaderWidget(
               title: 'Apariencia',
-              subtitle: 'Próximamente',
+              subtitle: 'Tema, color y fondo',
             ),
             gap12,
-            const RoundedCard(
-              padding: EdgeInsets.all(16),
+            RoundedCard(
+              padding: const EdgeInsets.all(16),
+              onTap: () => context.push('/appearance'),
               child: Row(
                 children: [
-                  Icon(Icons.dark_mode_outlined, color: AppColors.textSecondary),
-                  SizedBox(width: 16),
-                  Expanded(
-                    child: Text('Tema'),
+                  Icon(
+                    Icons.palette_outlined,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
+                  const SizedBox(width: 16),
+                  const Expanded(
+                    child: Text('Tema y fondo'),
+                  ),
+                  Icon(
+                    Icons.chevron_right,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ],
+              ),
+            ),
+            gap12,
+            RoundedCard(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.dark_mode_outlined,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: 16),
+                  const Expanded(child: Text('Modo actual')),
                   Chip(
-                    label: Text('Oscuro'),
+                    label: Text('Sigue al sistema'),
                     labelStyle: TextStyle(fontSize: 12),
                     visualDensity: VisualDensity.compact,
                   ),
@@ -59,26 +82,38 @@ class SettingsScreen extends StatelessWidget {
               subtitle: 'Reproducción y audio',
             ),
             gap12,
-            const RoundedCard(
-              padding: EdgeInsets.all(16),
+            RoundedCard(
+              padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  Icon(Icons.audiotrack_outlined, color: AppColors.textSecondary),
-                  SizedBox(width: 16),
-                  Expanded(child: Text('Calidad de audio')),
-                  Icon(Icons.chevron_right, color: AppColors.textSecondary),
+                  Icon(
+                    Icons.audiotrack_outlined,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: 16),
+                  const Expanded(child: Text('Calidad de audio')),
+                  Icon(
+                    Icons.chevron_right,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ],
               ),
             ),
             gap12,
-            const RoundedCard(
-              padding: EdgeInsets.all(16),
+            RoundedCard(
+              padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  Icon(Icons.storage_outlined, color: AppColors.textSecondary),
-                  SizedBox(width: 16),
-                  Expanded(child: Text('Almacenamiento')),
-                  Icon(Icons.chevron_right, color: AppColors.textSecondary),
+                  Icon(
+                    Icons.storage_outlined,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: 16),
+                  const Expanded(child: Text('Almacenamiento')),
+                  Icon(
+                    Icons.chevron_right,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ],
               ),
             ),
@@ -105,7 +140,7 @@ class SectionHeaderWidget extends StatelessWidget {
           Text(
             subtitle!,
             style: theme.textTheme.labelMedium?.copyWith(
-              color: theme.colorScheme.primary,
+              color: context.brandAccent,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -136,12 +171,12 @@ class _AppInfoCard extends StatelessWidget {
             width: 56,
             height: 56,
             decoration: BoxDecoration(
-              color: AppColors.accent,
+              color: theme.colorScheme.primary,
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.music_note,
-              color: Colors.black,
+              color: theme.colorScheme.onPrimary,
               size: 32,
             ),
           ),
@@ -196,7 +231,10 @@ class _LibraryScanCard extends ConsumerWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.manage_search, color: AppColors.textSecondary),
+              Icon(
+                Icons.manage_search,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(

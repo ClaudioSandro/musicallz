@@ -187,7 +187,7 @@ class _LibraryTabBar extends StatelessWidget {
     return TabBar(
       isScrollable: true,
       tabAlignment: TabAlignment.start,
-      labelColor: Colors.white,
+      labelColor: theme.colorScheme.onSurface,
       unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
       indicatorColor: theme.colorScheme.primary,
       indicatorSize: TabBarIndicatorSize.label,
@@ -279,7 +279,10 @@ class _PlaylistsView extends ConsumerWidget {
                         color: theme.colorScheme.surfaceContainerHigh,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Icon(Icons.add, color: Colors.white),
+                      child: Icon(
+                        Icons.add,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
                     ),
                     title: const Text(
                       'Create Playlist',
@@ -335,11 +338,13 @@ class _PlaylistsView extends ConsumerWidget {
                   if (index == 2) return likedTile();
 
                   if (playlists.isEmpty) {
-                    return const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                       child: Text(
                         'Your playlists will appear here.',
-                        style: TextStyle(color: Colors.white60),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     );
                   }
@@ -657,9 +662,13 @@ class _CreatePlaylistCard extends StatelessWidget {
               color: theme.colorScheme.surfaceContainerHigh,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const AspectRatio(
+            child: AspectRatio(
               aspectRatio: 1,
-              child: Icon(Icons.add, color: Colors.white, size: 40),
+              child: Icon(
+                Icons.add,
+                color: theme.colorScheme.onSurfaceVariant,
+                size: 40,
+              ),
             ),
           ),
           const SizedBox(height: 8),

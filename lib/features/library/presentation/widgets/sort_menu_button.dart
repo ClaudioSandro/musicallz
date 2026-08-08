@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_colors.dart';
-
 /// A single selectable sort option for [SortMenuButton].
 typedef SortOption<T> = ({T value, String label, IconData icon});
 
@@ -34,7 +32,7 @@ class SortMenuButton<T> extends StatelessWidget {
   Future<void> _open(BuildContext context) async {
     final result = await showModalBottomSheet<T>(
       context: context,
-      backgroundColor: AppColors.surface,
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -49,7 +47,10 @@ class SortMenuButton<T> extends StatelessWidget {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.white24,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurfaceVariant
+                      .withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(99),
                 ),
               ),
@@ -65,7 +66,10 @@ class SortMenuButton<T> extends StatelessWidget {
                     ),
                   ),
                   trailing: option.value == selected
-                      ? const Icon(Icons.check, color: AppColors.accent)
+                      ? Icon(
+                          Icons.check,
+                          color: Theme.of(context).colorScheme.primary,
+                        )
                       : null,
                   onTap: () => Navigator.of(sheetContext).pop(option.value),
                 ),

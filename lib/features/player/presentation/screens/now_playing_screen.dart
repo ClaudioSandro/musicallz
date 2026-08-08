@@ -6,7 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/constants/app_colors.dart';
+import '../../../../core/theme/theme_extension.dart';
+import '../../../../core/theme/theme_backdrop.dart';
 import '../../../../core/utils/color_utils.dart';
 import '../../../../core/utils/format_duration.dart';
 import '../../../library/domain/entities/song.dart';
@@ -26,7 +27,7 @@ class NowPlayingScreen extends ConsumerStatefulWidget {
 
 class _NowPlayingScreenState extends ConsumerState<NowPlayingScreen> {
   double? _dragMs;
-  Color _baseColor = AppColors.surfaceHigh;
+  Color? _baseColor;
   Timer? _colorDebounce;
 
   @override
@@ -47,7 +48,7 @@ class _NowPlayingScreenState extends ConsumerState<NowPlayingScreen> {
     final bytes = song.albumArt;
     final path = song.albumArtPath;
     if (bytes == null && path == null) {
-      setState(() => _baseColor = AppColors.surfaceHigh);
+      setState(() => _baseColor = null);
       return;
     }
     _colorDebounce = Timer(const Duration(milliseconds: 250), () async {
@@ -60,14 +61,23 @@ class _NowPlayingScreenState extends ConsumerState<NowPlayingScreen> {
         }
       }
       if (data == null) {
-        if (mounted) setState(() => _baseColor = AppColors.surfaceHigh);
+        if (mounted) setState(() => _baseColor = null);
         return;
       }
       final color = await extractDominantColor(data);
       if (mounted && ref.read(currentSongProvider)?.id == song.id) {
-        setState(() => _baseColor = color ?? AppColors.surfaceHigh);
+        setState(() => _baseColor = color);
       }
     });
+  }
+
+  ImageProvider? _artworkProvider(Song? song) {
+    if (song == null) return null;
+    final bytes = song.albumArt;
+    if (bytes != null) return MemoryImage(bytes);
+    final path = song.albumArtPath;
+    if (path != null && File(path).existsSync()) return FileImage(File(path));
+    return null;
   }
 
   @override
@@ -92,7 +102,7 @@ class _NowPlayingScreenState extends ConsumerState<NowPlayingScreen> {
     final remaining = duration - displayPos;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.transparent,
       body: GestureDetector(
         onVerticalDragEnd: (details) {
           if (details.primaryVelocity != null &&
@@ -100,19 +110,9 @@ class _NowPlayingScreenState extends ConsumerState<NowPlayingScreen> {
             context.pop();
           }
         },
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 900),
-          curve: Curves.easeOutCubic,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Color.lerp(_baseColor, Colors.black, 0.72)!,
-                Color.lerp(_baseColor, Colors.black, 0.92)!,
-              ],
-            ),
-          ),
+        child: ThemeBackdrop(
+          artColor: _baseColor,
+          image: _artworkProvider(song),
           child: SafeArea(
             child: Column(
               children: [
@@ -204,16 +204,16 @@ class _NowPlayingScreenState extends ConsumerState<NowPlayingScreen> {
                         children: [
                           Text(
                             formatDuration(displayPos),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 11,
-                              color: AppColors.textSecondary,
+                              color: context.appTheme.headerTextMuted,
                             ),
                           ),
                           Text(
                             formatDuration(remaining),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 11,
-                              color: AppColors.textSecondary,
+                              color: context.appTheme.headerTextMuted,
                             ),
                           ),
                         ],
@@ -230,8 +230,8 @@ class _NowPlayingScreenState extends ConsumerState<NowPlayingScreen> {
                                 icon: Icons.shuffle,
                                 size: 20,
                                 color: shuffle
-                                    ? AppColors.accent
-                                    : AppColors.textSecondary,
+                                    ? context.appTheme.gradientStart
+                                    : context.appTheme.headerTextMuted,
                                 onTap: () => ref
                                     .read(playerControllerProvider.notifier)
                                     .toggleShuffle(),
@@ -372,9 +372,9 @@ class _TitleBlock extends StatelessWidget {
             artist,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
-              color: AppColors.textSecondary,
+              color: context.appTheme.headerTextMuted,
             ),
           ),
         ],
@@ -428,8 +428,8 @@ class _RepeatButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final color = mode == RepeatMode.off
-        ? AppColors.textSecondary
-        : AppColors.accent;
+        ? context.appTheme.headerTextMuted
+        : context.appTheme.gradientStart;
     return Tooltip(
       message: 'Repeat',
       child: InkResponse(
@@ -454,10 +454,14 @@ class _RepeatButton extends ConsumerWidget {
                 ),
               ),
               if (mode == RepeatMode.all)
-                const Positioned(
+                Positioned(
                   right: 4,
                   top: 2,
-                  child: Icon(Icons.circle, size: 6, color: AppColors.accent),
+                  child: Icon(
+                    Icons.circle,
+                    size: 6,
+                    color: context.appTheme.gradientStart,
+                  ),
                 ),
             ],
           ),

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../core/constants/app_colors.dart';
-
 /// A shimmering placeholder box used to render "loading skeletons" while async
 /// data is being resolved. Purely presentational.
 class SkeletonBox extends StatefulWidget {
@@ -41,13 +39,16 @@ class _SkeletonBoxState extends State<SkeletonBox>
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, _) {
         final value = _controller.value;
-        final base = HSLColor.fromColor(AppColors.surfaceHigh)
-            .withLightness((0.16 + value * 0.06).clamp(0.0, 1.0))
-            .toColor();
+        final base = Color.lerp(
+          scheme.surfaceContainerHigh,
+          scheme.surfaceContainerHighest,
+          value,
+        )!;
         return Container(
           width: widget.width,
           height: widget.height,

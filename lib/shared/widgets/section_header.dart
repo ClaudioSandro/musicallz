@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../core/theme/theme_extension.dart';
+
 class SectionHeader extends StatelessWidget {
   const SectionHeader({
     super.key,
@@ -27,7 +29,7 @@ class SectionHeader extends StatelessWidget {
                 Text(
                   subtitle!,
                   style: theme.textTheme.labelMedium?.copyWith(
-                    color: theme.colorScheme.primary,
+                    color: context.brandAccent,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

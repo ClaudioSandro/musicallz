@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/constants/app_colors.dart';
 import '../../../../shared/widgets/favorite_button.dart';
 import '../../../../shared/widgets/marquee_text.dart';
 import '../../../library/presentation/widgets/cover_art.dart';
@@ -26,7 +25,7 @@ class MiniPlayer extends ConsumerWidget {
         : 0.0;
 
     return Material(
-      color: AppColors.surface,
+      color: Theme.of(context).colorScheme.surface,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () => context.push('/now-playing'),
@@ -38,7 +37,7 @@ class MiniPlayer extends ConsumerWidget {
             Container(
               height: 3,
               width: double.infinity,
-              color: AppColors.surfaceHigh,
+              color: Theme.of(context).colorScheme.surfaceContainerHigh,
               alignment: Alignment.centerLeft,
               child: TweenAnimationBuilder<double>(
                 tween: Tween<double>(begin: fraction, end: fraction),
@@ -49,14 +48,16 @@ class MiniPlayer extends ConsumerWidget {
                   widthFactor: value,
                   child: child,
                 ),
-                child: const ColoredBox(color: AppColors.accent),
+                child: ColoredBox(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               ),
             ),
             Container(
               height: 62,
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: const BoxDecoration(
-                color: AppColors.surface,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
               ),
               child: Row(
                 children: [
@@ -89,7 +90,11 @@ class MiniPlayer extends ConsumerWidget {
                           style: Theme.of(context)
                               .textTheme
                               .bodySmall
-                              ?.copyWith(color: AppColors.textSecondary),
+                              ?.copyWith(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
+                              ),
                         ),
                       ],
                     ),
@@ -114,6 +119,7 @@ class _PlayPauseButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final playing = ref.watch(isPlayingProvider);
     final ctrl = ref.read(playerControllerProvider.notifier);
+    final fg = Theme.of(context).colorScheme.onSurface;
     return IconButton(
       onPressed: () {
         HapticFeedback.selectionClick();
@@ -121,7 +127,7 @@ class _PlayPauseButton extends ConsumerWidget {
       },
       icon: Icon(
         playing ? Icons.pause_circle_filled : Icons.play_circle_filled,
-        color: Colors.white,
+        color: fg,
         size: 34,
       ),
       tooltip: playing ? 'Pause' : 'Play',
@@ -134,10 +140,11 @@ class _NextButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final fg = Theme.of(context).colorScheme.onSurface;
     return IconButton(
       onPressed: () =>
           ref.read(playerControllerProvider.notifier).next(),
-      icon: const Icon(Icons.skip_next, color: Colors.white, size: 30),
+      icon: Icon(Icons.skip_next, color: fg, size: 30),
       tooltip: 'Next',
     );
   }

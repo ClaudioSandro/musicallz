@@ -84,6 +84,10 @@ void main() {
 
     await tester.tap(find.text('Settings'));
     await tester.pumpAndSettle();
+    // The settings list grew (Appearance section), so scroll down to the
+    // future-settings section before asserting it is rendered.
+    await tester.drag(find.byType(ListView), const Offset(0, -300));
+    await tester.pumpAndSettle();
     expect(find.text('Configuraciones futuras'), findsOneWidget);
 
     await tester.tap(find.text('Search'));

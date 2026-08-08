@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/utils/app_gaps.dart';
 
@@ -77,7 +76,7 @@ class _PlaylistDialogState extends State<_PlaylistDialog> {
     final theme = Theme.of(context);
 
     return Dialog(
-      backgroundColor: AppColors.surface,
+      backgroundColor: theme.colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
@@ -130,8 +129,8 @@ class _PlaylistDialogState extends State<_PlaylistDialog> {
                   child: FilledButton(
                     onPressed: _submit,
                     style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.accent,
-                      foregroundColor: Colors.black,
+                      backgroundColor: theme.colorScheme.primary,
+                      foregroundColor: theme.colorScheme.onPrimary,
                     ),
                     child: Text(widget.confirmLabel),
                   ),

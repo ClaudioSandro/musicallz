@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimens.dart';
 import '../../../core/utils/app_gaps.dart';
+import '../../../core/theme/theme_extension.dart';
 import '../../../core/widgets/player_bottom_shell.dart';
 import '../../../features/library/presentation/providers/library_index_provider.dart';
 import '../../../features/library/presentation/widgets/album_card.dart';
@@ -62,8 +62,10 @@ class GenreDetailScreen extends ConsumerWidget {
             SliverAppBar(
               pinned: true,
               expandedHeight: 200,
-              backgroundColor: theme.colorScheme.surface,
+              backgroundColor:
+                  Color.lerp(context.appTheme.gradientStart, Colors.black, 0.4)!,
               surfaceTintColor: Colors.transparent,
+              iconTheme: const IconThemeData(color: Colors.white),
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back),
                 onPressed: () => Navigator.of(context).pop(),
@@ -75,7 +77,7 @@ class GenreDetailScreen extends ConsumerWidget {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        Color.lerp(AppColors.accent, Colors.black, 0.4)!,
+                        Color.lerp(context.appTheme.gradientStart, Colors.black, 0.4)!,
                         Colors.black.withValues(alpha: 0.4),
                       ],
                     ),
