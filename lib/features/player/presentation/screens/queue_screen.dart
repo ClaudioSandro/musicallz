@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/theme/theme_extension.dart';
 import '../../../../core/utils/format_duration.dart';
 import '../../../../core/widgets/player_bottom_shell.dart';
 import '../../../../features/library/domain/entities/song.dart';
@@ -148,7 +149,7 @@ class _CurrentRow extends ConsumerWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
-          color: theme.colorScheme.primary,
+          color: context.brandAccent,
           fontWeight: FontWeight.w600,
         ),
       ),

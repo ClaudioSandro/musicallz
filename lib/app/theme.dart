@@ -111,7 +111,9 @@ abstract final class AppTheme {
         ? (palette.primary.computeLuminance() > 0.5
             ? Colors.black
             : Colors.white)
-        : palette.primary;
+        : (palette.primary.computeLuminance() > 0.55
+            ? Colors.black
+            : palette.primary);
     return NavigationBarThemeData(
       backgroundColor: colors.surface,
       indicatorColor: indicator,

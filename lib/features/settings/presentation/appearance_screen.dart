@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/app_dimens.dart';
 import '../../../core/theme/app_theme_config.dart';
+import '../../../core/theme/theme_extension.dart';
 import '../../../core/theme/theme_models.dart';
 import '../../../core/theme/theme_provider.dart';
 import '../../../core/utils/app_gaps.dart';
@@ -653,7 +654,7 @@ class SectionHeaderWidget extends StatelessWidget {
           Text(
             subtitle!,
             style: theme.textTheme.labelMedium?.copyWith(
-              color: theme.colorScheme.primary,
+              color: context.brandAccent,
               fontWeight: FontWeight.w600,
             ),
           ),

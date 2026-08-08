@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_dimens.dart';
+import '../../../core/theme/theme_extension.dart';
 import '../../../core/utils/app_gaps.dart';
 import '../../../features/library/presentation/providers/music_library_provider.dart';
 import '../../../shared/widgets/rounded_card.dart';
@@ -139,7 +140,7 @@ class SectionHeaderWidget extends StatelessWidget {
           Text(
             subtitle!,
             style: theme.textTheme.labelMedium?.copyWith(
-              color: theme.colorScheme.primary,
+              color: context.brandAccent,
               fontWeight: FontWeight.w600,
             ),
           ),

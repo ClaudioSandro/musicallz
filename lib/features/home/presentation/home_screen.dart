@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_dimens.dart';
+import '../../../core/theme/theme_extension.dart';
 import '../../../core/utils/app_gaps.dart';
 import '../../../features/library/domain/entities/song.dart';
 import '../../../features/library/domain/exceptions/music_library_exceptions.dart';
@@ -58,7 +59,7 @@ class HomeScreen extends ConsumerWidget {
                           'Musicallz',
                           style: theme.textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.w800,
-                            color: theme.colorScheme.primary,
+                            color: context.brandAccent,
                           ),
                         ),
                       ),

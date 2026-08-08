@@ -68,6 +68,19 @@ extension AppThemeContext on BuildContext {
   /// widget tests that pump screens under a plain `MaterialApp`).
   AppThemeExtension get appTheme =>
       Theme.of(this).extension<AppThemeExtension>() ?? _kDefaultThemeTokens;
+
+  /// Brand accent for text/icons sitting on a surface. Falls back to the
+  /// surface foreground when the palette primary is too light to be read on a
+  /// light background (e.g. the AMOLED/monochrome palettes in light mode).
+  Color get brandAccent {
+    final theme = Theme.of(this);
+    final primary = theme.colorScheme.primary;
+    final isLight = theme.brightness == Brightness.light;
+    if (isLight && primary.computeLuminance() > 0.45) {
+      return theme.colorScheme.onSurface;
+    }
+    return primary;
+  }
 }
 
 const AppThemeExtension _kDefaultThemeTokens = AppThemeExtension(
