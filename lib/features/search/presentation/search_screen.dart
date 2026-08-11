@@ -59,7 +59,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Search',
+                    'Buscar',
                     style: theme.textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.w800,
                     ),
@@ -129,7 +129,7 @@ class _SearchFieldState extends State<_SearchField> {
               onEditingComplete: () => setState(() => _focused = false),
               decoration: InputDecoration(
                 border: InputBorder.none,
-                hintText: 'Qué quieres escuchar?',
+                hintText: '¿Qué quieres escuchar?',
                 hintStyle: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),

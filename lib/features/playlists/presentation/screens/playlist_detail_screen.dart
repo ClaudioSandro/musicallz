@@ -32,8 +32,8 @@ class PlaylistDetailScreen extends ConsumerWidget {
           appBar: AppBar(),
           body: const EmptyState(
             icon: Icons.queue_music,
-            title: 'Playlist not found',
-            message: 'This playlist was deleted.',
+            title: 'Lista no encontrada',
+            message: 'Esta lista fue eliminada.',
           ),
         ),
       );
@@ -67,8 +67,8 @@ class PlaylistDetailScreen extends ConsumerWidget {
                 onEdit: () async {
                   final draft = await showPlaylistDialog(
                     context,
-                    title: 'Edit Playlist',
-                    confirmLabel: 'Save',
+                    title: 'Editar lista',
+                    confirmLabel: 'Guardar',
                     initialName: playlist.name,
                     initialDescription: playlist.description ?? '',
                   );
@@ -87,22 +87,22 @@ class PlaylistDetailScreen extends ConsumerWidget {
                     builder: (context) => AlertDialog(
                       backgroundColor:
                           Theme.of(context).colorScheme.surfaceContainerLow,
-                      title: const Text('Delete playlist?'),
+                      title: const Text('¿Eliminar lista?'),
                       content: Text(
-                        '"${playlist.name}" and its play order will be '
-                        'removed. Your songs are not affected.',
+                        '"${playlist.name}" y su orden de reproducción serán '
+                        'eliminados. Tus canciones no se verán afectadas.',
                       ),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.of(context).pop(false),
-                          child: const Text('Cancel'),
+                          child: const Text('Cancelar'),
                         ),
                         FilledButton(
                           onPressed: () => Navigator.of(context).pop(true),
                           style: FilledButton.styleFrom(
                             backgroundColor: Colors.redAccent,
                           ),
-                          child: const Text('Delete'),
+                          child: const Text('Eliminar'),
                         ),
                       ],
                     ),
@@ -117,9 +117,9 @@ class PlaylistDetailScreen extends ConsumerWidget {
                 child: songs.isEmpty
                     ? const EmptyState(
                         icon: Icons.queue_music,
-                        title: 'No songs yet',
-                        message: 'Use "Add to playlist" on any song to fill '
-                            'this playlist.',
+                        title: 'Aún no hay canciones',
+                        message: 'Usa "Añadir a la lista" en cualquier canción '
+                            'para llenar esta lista.',
                       )
                     : ReorderableListView.builder(
                         padding:
@@ -185,7 +185,7 @@ class _PlaylistHeader extends StatelessWidget {
               IconButton(
                 onPressed: () => Navigator.of(context).pop(),
                 icon: const Icon(Icons.arrow_back),
-                tooltip: 'Back',
+                tooltip: 'Atrás',
               ),
               const Spacer(),
               PopupMenuButton<String>(
@@ -196,10 +196,10 @@ class _PlaylistHeader extends StatelessWidget {
                 },
                 color: Theme.of(context).colorScheme.surfaceContainerHigh,
                 itemBuilder: (context) => const [
-                  PopupMenuItem(value: 'edit', child: Text('Edit details')),
+                  PopupMenuItem(value: 'edit', child: Text('Editar detalles')),
                   PopupMenuItem(
                     value: 'delete',
-                    child: Text('Delete playlist',
+                    child: Text('Eliminar lista',
                         style: TextStyle(color: Colors.redAccent)),
                   ),
                 ],
@@ -236,7 +236,7 @@ class _PlaylistHeader extends StatelessWidget {
                     ],
                     const SizedBox(height: 4),
                     Text(
-                      '$count song${count == 1 ? '' : 's'} · '
+                      '$count ${count == 1 ? 'canción' : 'canciones'} · '
                       '${formatPlaylistDuration(totalDuration)}',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
@@ -253,7 +253,7 @@ class _PlaylistHeader extends StatelessWidget {
               IconButton.filled(
                 onPressed: onPlay,
                 icon: const Icon(Icons.play_arrow, size: 30),
-                tooltip: 'Play playlist',
+                tooltip: 'Reproducir lista',
                 style: IconButton.styleFrom(
                   backgroundColor: theme.colorScheme.primary,
                   foregroundColor: theme.colorScheme.onPrimary,
@@ -266,7 +266,7 @@ class _PlaylistHeader extends StatelessWidget {
                   Icons.shuffle,
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
-                tooltip: 'Shuffle',
+                tooltip: 'Aleatorio',
               ),
             ],
           ),
@@ -344,7 +344,7 @@ class _PlaylistSongTile extends ConsumerWidget {
             icon: const Icon(Icons.more_horiz, size: 20),
             visualDensity: VisualDensity.compact,
             color: theme.colorScheme.onSurfaceVariant,
-            tooltip: 'More options',
+            tooltip: 'Más opciones',
           ),
         ],
       ),

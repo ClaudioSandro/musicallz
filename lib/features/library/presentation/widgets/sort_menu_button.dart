@@ -21,7 +21,7 @@ class SortMenuButton<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return IconButton(
-      tooltip: 'Sort',
+      tooltip: 'Ordenar',
       onPressed: () => _open(context),
       icon: const Icon(Icons.sort, size: 20),
       visualDensity: VisualDensity.compact,

@@ -46,9 +46,9 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
-    expect(find.text('NOW PLAYING'), findsOneWidget);
+    expect(find.text('REPRODUCIENDO AHORA'), findsOneWidget);
     expect(find.text('Song A'), findsOneWidget);
-    expect(find.text('UP NEXT · 1'), findsOneWidget);
+    expect(find.text('A CONTINUACIÓN · 1'), findsOneWidget);
     expect(find.text('Song B'), findsOneWidget);
     expect(find.byType(ReorderableListView), findsOneWidget);
   });
@@ -59,9 +59,9 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
-    expect(find.text('UP NEXT · EMPTY'), findsOneWidget);
+    expect(find.text('A CONTINUACIÓN · VACÍA'), findsOneWidget);
     expect(
-      find.textContaining('Nothing next in the queue'),
+      find.textContaining('Nada más en la cola'),
       findsOneWidget,
     );
   });
@@ -72,6 +72,6 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
-    expect(find.text('Nothing playing'), findsOneWidget);
+    expect(find.text('Nada en reproducción'), findsOneWidget);
   });
 }

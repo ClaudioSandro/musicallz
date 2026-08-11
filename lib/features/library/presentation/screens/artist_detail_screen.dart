@@ -32,8 +32,8 @@ class ArtistDetailScreen extends ConsumerWidget {
           appBar: AppBar(),
           body: const EmptyState(
             icon: Icons.person_off_outlined,
-            title: 'Artist not found',
-            message: 'This artist is no longer available in your library.',
+            title: 'Artista no encontrado',
+            message: 'Este artista ya no está disponible en tu biblioteca.',
           ),
         ),
       );
@@ -184,7 +184,7 @@ class _ArtistHeader extends ConsumerWidget {
                       IconButton.filled(
                         onPressed: onPlay,
                         icon: const Icon(Icons.play_arrow, size: 28),
-                        tooltip: 'Play artist',
+                        tooltip: 'Reproducir artista',
                         style: IconButton.styleFrom(
                           backgroundColor: theme.colorScheme.primary,
                           foregroundColor: theme.colorScheme.onPrimary,
@@ -201,7 +201,7 @@ class _ArtistHeader extends ConsumerWidget {
                               ? theme.colorScheme.primary
                               : Colors.white,
                         ),
-                        tooltip: followed ? 'Following' : 'Follow artist',
+                        tooltip: followed ? 'Siguiendo' : 'Seguir artista',
                       ),
                     ],
                   ),

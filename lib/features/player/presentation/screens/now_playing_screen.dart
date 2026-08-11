@@ -235,7 +235,7 @@ class _NowPlayingScreenState extends ConsumerState<NowPlayingScreen> {
                                 onTap: () => ref
                                     .read(playerControllerProvider.notifier)
                                     .toggleShuffle(),
-                                tooltip: 'Shuffle',
+                                tooltip: 'Aleatorio',
                                 boxSize: 38,
                               ),
                               const SizedBox(width: 6),
@@ -245,7 +245,7 @@ class _NowPlayingScreenState extends ConsumerState<NowPlayingScreen> {
                                 onTap: () => ref
                                     .read(playerControllerProvider.notifier)
                                     .previous(),
-                                tooltip: 'Previous',
+                                tooltip: 'Anterior',
                                 boxSize: 44,
                               ),
                               const SizedBox(width: 6),
@@ -256,7 +256,7 @@ class _NowPlayingScreenState extends ConsumerState<NowPlayingScreen> {
                                 onTap: () => ref
                                     .read(playerControllerProvider.notifier)
                                     .seekBackward(),
-                                tooltip: 'Back 10 seconds',
+                                tooltip: 'Retroceder 10 segundos',
                                 boxSize: 38,
                               ),
                               const SizedBox(width: 6),
@@ -269,7 +269,7 @@ class _NowPlayingScreenState extends ConsumerState<NowPlayingScreen> {
                                 onTap: () => ref
                                     .read(playerControllerProvider.notifier)
                                     .seekForward(),
-                                tooltip: 'Forward 10 seconds',
+                                tooltip: 'Adelantar 10 segundos',
                                 boxSize: 38,
                               ),
                               const SizedBox(width: 6),
@@ -279,7 +279,7 @@ class _NowPlayingScreenState extends ConsumerState<NowPlayingScreen> {
                                 onTap: () => ref
                                     .read(playerControllerProvider.notifier)
                                     .next(),
-                                tooltip: 'Next',
+                                tooltip: 'Siguiente',
                                 boxSize: 44,
                               ),
                               const SizedBox(width: 6),
@@ -315,11 +315,11 @@ class _TopBar extends ConsumerWidget {
             onPressed: () => context.pop(),
             icon: const Icon(Icons.keyboard_arrow_down,
                 color: Colors.white, size: 32),
-            tooltip: 'Collapse',
+            tooltip: 'Contraer',
           ),
           const Expanded(
             child: Text(
-              'NOW PLAYING',
+              'REPRODUCIENDO AHORA',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white70,
@@ -333,7 +333,7 @@ class _TopBar extends ConsumerWidget {
             IconButton(
               onPressed: () => context.push('/queue'),
               icon: const Icon(Icons.queue_music, color: Colors.white70, size: 22),
-              tooltip: 'Queue',
+              tooltip: 'Cola',
             ),
             const SizedBox(width: 4),
             FavoriteButton(songId: song.id, size: 24),
@@ -431,7 +431,7 @@ class _RepeatButton extends ConsumerWidget {
         ? context.appTheme.headerTextMuted
         : context.appTheme.gradientStart;
     return Tooltip(
-      message: 'Repeat',
+      message: 'Repetir',
       child: InkResponse(
         onTap: () {
           HapticFeedback.selectionClick();
@@ -479,7 +479,7 @@ class _PlayPauseButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Tooltip(
-      message: playing ? 'Pause' : 'Play',
+      message: playing ? 'Pausa' : 'Reproducir',
       child: InkResponse(
         onTap: () {
           HapticFeedback.mediumImpact();

@@ -11,8 +11,8 @@ typedef PlaylistDraft = ({String name, String description});
 /// optional description). Name cannot be empty. Returns `null` if dismissed.
 Future<PlaylistDraft?> showPlaylistDialog(
   BuildContext context, {
-  String title = 'Playlist',
-  String confirmLabel = 'Create',
+  String title = 'Lista',
+  String confirmLabel = 'Crear',
   String? initialName,
   String? initialDescription,
 }) {
@@ -103,13 +103,13 @@ class _PlaylistDialogState extends State<_PlaylistDialog> {
                   maxLength: 60,
                   textCapitalization: TextCapitalization.words,
                   decoration: const InputDecoration(
-                    labelText: 'Name',
-                    hintText: 'My Playlist',
+                    labelText: 'Nombre',
+                    hintText: 'Mi lista',
                     counterText: '',
                   ),
                   validator: (value) =>
                       (value == null || value.trim().isEmpty)
-                          ? 'Give your playlist a name'
+                          ? 'Ponle un nombre a tu lista'
                           : null,
                 ),
                 gap8,
@@ -119,7 +119,7 @@ class _PlaylistDialogState extends State<_PlaylistDialog> {
                   maxLength: 200,
                   textCapitalization: TextCapitalization.sentences,
                   decoration: const InputDecoration(
-                    labelText: 'Description (optional)',
+                    labelText: 'Descripción (opcional)',
                     counterText: '',
                   ),
                 ),

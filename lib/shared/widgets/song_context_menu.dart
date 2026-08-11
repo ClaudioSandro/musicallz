@@ -108,7 +108,7 @@ class _SongContextMenu extends ConsumerWidget {
         ),
         onTap: onTap ??
             () => _placeholder(
-                context, '$label is not available in this version yet.'),
+                context, '$label no está disponible en esta versión todavía.'),
       );
     }
 
@@ -173,7 +173,7 @@ class _SongContextMenu extends ConsumerWidget {
             const SizedBox(height: 8),
             item(
               icon: Icons.play_arrow_rounded,
-              label: 'Play',
+              label: 'Reproducir',
               onTap: () {
                 HapticFeedback.selectionClick();
                 Navigator.of(context).pop();
@@ -182,7 +182,7 @@ class _SongContextMenu extends ConsumerWidget {
             ),
             item(
               icon: Icons.playlist_add,
-              label: 'Add to playlist',
+              label: 'Añadir a la lista',
               onTap: () {
                 HapticFeedback.selectionClick();
                 Navigator.of(context).pop();
@@ -192,31 +192,31 @@ class _SongContextMenu extends ConsumerWidget {
             ),
             item(
               icon: Icons.queue_music,
-              label: 'Play next',
+              label: 'Reproducir después',
               onTap: () {
                 HapticFeedback.selectionClick();
                 Navigator.of(context).pop();
                 if (!callerContext.mounted) return;
                 player.playNext(song);
-                _notify(callerContext, 'Playing next');
+                _notify(callerContext, 'Reproduciendo después');
               },
             ),
             item(
               icon: Icons.add_to_queue,
-              label: 'Add to queue',
+              label: 'Añadir a la cola',
               onTap: () {
                 HapticFeedback.selectionClick();
                 Navigator.of(context).pop();
                 if (!callerContext.mounted) return;
                 player.addToQueue(song);
-                _notify(callerContext, 'Added to queue');
+                _notify(callerContext, 'Añadido a la cola');
               },
             ),
             item(
               icon: isFavorite ? Icons.favorite : Icons.favorite_border,
               label: isFavorite
-                  ? 'Remove from Liked Songs'
-                  : 'Add to Liked Songs',
+                  ? 'Quitar de Canciones que me gustan'
+                  : 'Añadir a Canciones que me gustan',
               color: isFavorite ? theme.colorScheme.primary : null,
               onTap: () {
                 HapticFeedback.selectionClick();
@@ -227,7 +227,7 @@ class _SongContextMenu extends ConsumerWidget {
             if (currentPlaylist != null)
               item(
                 icon: Icons.playlist_remove,
-                label: 'Remove from ${currentPlaylist.name}',
+                label: 'Quitar de ${currentPlaylist.name}',
                 onTap: () {
                   HapticFeedback.selectionClick();
                   playlistRepo.removeSong(currentPlaylist.id, song.id);
@@ -236,7 +236,7 @@ class _SongContextMenu extends ConsumerWidget {
               ),
             item(
               icon: Icons.person_outline,
-              label: 'Go to artist',
+              label: 'Ir al artista',
               onTap: () {
                 HapticFeedback.selectionClick();
                 Navigator.of(context).pop();
@@ -248,7 +248,7 @@ class _SongContextMenu extends ConsumerWidget {
             ),
             item(
               icon: Icons.album_outlined,
-              label: 'Go to album',
+              label: 'Ir al álbum',
               onTap: () {
                 HapticFeedback.selectionClick();
                 Navigator.of(context).pop();
@@ -261,12 +261,12 @@ class _SongContextMenu extends ConsumerWidget {
             ),
             item(
               icon: Icons.share_outlined,
-              label: 'Share',
-              onTap: () => _placeholder(context, 'Share'),
+              label: 'Compartir',
+              onTap: () => _placeholder(context, 'Compartir'),
             ),
             item(
               icon: Icons.info_outline,
-              label: 'File info',
+              label: 'Información del archivo',
               onTap: () {
                 HapticFeedback.selectionClick();
                 Navigator.of(context).pop();

@@ -36,8 +36,8 @@ Future<void> showAddToPlaylistSheet(
   if (identical(selection, _createNew)) {
     final draft = await showPlaylistDialog(
       context,
-      title: 'New Playlist',
-      confirmLabel: 'Create & Add',
+      title: 'Nueva lista',
+      confirmLabel: 'Crear y añadir',
     );
     if (draft == null || !context.mounted) return;
     final playlist = await repo.createPlaylist(
@@ -46,12 +46,12 @@ Future<void> showAddToPlaylistSheet(
     );
     await repo.addSong(playlist.id, song.id);
     if (!context.mounted) return;
-    _notify(context, 'Added to ${playlist.name}');
+    _notify(context, 'Añadida a ${playlist.name}');
   } else {
     final chosen = selection as ({int id, String name});
     await repo.addSong(chosen.id, song.id);
     if (!context.mounted) return;
-    _notify(context, 'Added to ${chosen.name}');
+    _notify(context, 'Añadida a ${chosen.name}');
   }
 }
 
@@ -89,7 +89,7 @@ class _AddToPlaylistSheet extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
               child: Text(
-                'Add to playlist',
+                'Añadir a la lista',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
@@ -98,7 +98,7 @@ class _AddToPlaylistSheet extends ConsumerWidget {
             ListTile(
               leading: Icon(Icons.add, color: theme.colorScheme.onSurfaceVariant),
               title: const Text(
-                'New playlist',
+                'Nueva lista',
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
               ),
               onTap: () => Navigator.of(context).pop(_createNew),
@@ -151,7 +151,7 @@ class _PlaylistRow extends StatelessWidget {
         style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
       ),
       subtitle: Text(
-        '${playlist.songIds.length} songs',
+        '${playlist.songIds.length} ${playlist.songIds.length == 1 ? 'canción' : 'canciones'}',
         style: theme.textTheme.bodySmall?.copyWith(
           color: theme.colorScheme.onSurfaceVariant,
         ),

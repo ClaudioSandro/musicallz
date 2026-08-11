@@ -68,8 +68,8 @@ class _AlbumDetailScreenState extends ConsumerState<AlbumDetailScreen> {
           appBar: AppBar(),
           body: const EmptyState(
             icon: Icons.album_outlined,
-            title: 'Album not found',
-            message: 'This album is no longer available in your library.',
+            title: 'Álbum no encontrado',
+            message: 'Este álbum ya no está disponible en tu biblioteca.',
           ),
         ),
       );
@@ -125,7 +125,7 @@ class _AlbumDetailScreenState extends ConsumerState<AlbumDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Songs',
+                      'Canciones',
                       style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
@@ -259,7 +259,7 @@ class _AlbumHeader extends ConsumerWidget {
                       IconButton.filled(
                         onPressed: onPlay,
                         icon: const Icon(Icons.play_arrow, size: 28),
-                        tooltip: 'Play album',
+                        tooltip: 'Reproducir álbum',
                         style: IconButton.styleFrom(
                           backgroundColor: theme.colorScheme.primary,
                           foregroundColor: theme.colorScheme.onPrimary,
@@ -274,7 +274,7 @@ class _AlbumHeader extends ConsumerWidget {
                           saved ? Icons.favorite : Icons.favorite_border,
                           color: saved ? Colors.redAccent : Colors.white,
                         ),
-                        tooltip: saved ? 'Remove from saved' : 'Save album',
+                        tooltip: saved ? 'Quitar de guardados' : 'Guardar álbum',
                       ),
                     ],
                   ),

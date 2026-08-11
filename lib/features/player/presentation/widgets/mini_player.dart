@@ -130,7 +130,7 @@ class _PlayPauseButton extends ConsumerWidget {
         color: fg,
         size: 34,
       ),
-      tooltip: playing ? 'Pause' : 'Play',
+      tooltip: playing ? 'Pausa' : 'Reproducir',
     );
   }
 }
@@ -145,7 +145,7 @@ class _NextButton extends ConsumerWidget {
       onPressed: () =>
           ref.read(playerControllerProvider.notifier).next(),
       icon: Icon(Icons.skip_next, color: fg, size: 30),
-      tooltip: 'Next',
+      tooltip: 'Siguiente',
     );
   }
 }

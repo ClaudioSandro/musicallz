@@ -99,7 +99,7 @@ const _spotifyGreenBright = Color(0xFF1ED760);
 const List<ThemePalette> kThemePalettes = [
   ThemePalette(
     id: ThemePaletteId.spotifyGreen,
-    name: 'Spotify Green',
+    name: 'Verde Spotify',
     primary: _spotifyGreen,
     secondary: _spotifyGreenBright,
     background: Color(0xFF121212),
@@ -114,7 +114,7 @@ const List<ThemePalette> kThemePalettes = [
   ),
   ThemePalette(
     id: ThemePaletteId.oceanBlue,
-    name: 'Ocean Blue',
+    name: 'Azul océano',
     primary: Color(0xFF2196F3),
     secondary: Color(0xFF00E5FF),
     background: Color(0xFF0B1220),
@@ -129,7 +129,7 @@ const List<ThemePalette> kThemePalettes = [
   ),
   ThemePalette(
     id: ThemePaletteId.deepPurple,
-    name: 'Deep Purple',
+    name: 'Púrpura profundo',
     primary: Color(0xFF7C4DFF),
     secondary: Color(0xFFB388FF),
     background: Color(0xFF120E1F),
@@ -144,7 +144,7 @@ const List<ThemePalette> kThemePalettes = [
   ),
   ThemePalette(
     id: ThemePaletteId.sunsetOrange,
-    name: 'Sunset Orange',
+    name: 'Naranja atardecer',
     primary: Color(0xFFFF7043),
     secondary: Color(0xFFFFB300),
     background: Color(0xFF1F140F),
@@ -159,7 +159,7 @@ const List<ThemePalette> kThemePalettes = [
   ),
   ThemePalette(
     id: ThemePaletteId.crimsonRed,
-    name: 'Crimson Red',
+    name: 'Rojo carmesí',
     primary: Color(0xFFE53935),
     secondary: Color(0xFFFF6090),
     background: Color(0xFF1C1013),
@@ -174,7 +174,7 @@ const List<ThemePalette> kThemePalettes = [
   ),
   ThemePalette(
     id: ThemePaletteId.monochrome,
-    name: 'Monochrome',
+    name: 'Monocromo',
     primary: Color(0xFFBDBDBD),
     secondary: Color(0xFF8A8A8A),
     background: Color(0xFF121212),
@@ -189,7 +189,7 @@ const List<ThemePalette> kThemePalettes = [
   ),
   ThemePalette(
     id: ThemePaletteId.amoledBlack,
-    name: 'AMOLED Black',
+    name: 'Negro AMOLED',
     primary: Color(0xFFF2F2F2),
     secondary: Color(0xFF9E9E9E),
     background: Color(0xFF000000),

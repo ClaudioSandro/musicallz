@@ -67,8 +67,9 @@ class LikedSongsScreen extends ConsumerWidget {
                 child: songs.isEmpty
                     ? const EmptyState(
                         icon: Icons.favorite_border,
-                        title: 'No Liked Songs yet',
-                        message: 'Tap the heart on any song to save it here.',
+                        title: 'Aún no hay canciones que te gusten',
+                        message:
+                            'Toca el corazón en cualquier canción para guardarla aquí.',
                       )
                     : ListView.builder(
                         itemCount: sorted.length,
@@ -120,7 +121,7 @@ class _LikedHeader extends StatelessWidget {
               IconButton(
                 onPressed: () => Navigator.of(context).pop(),
                 icon: const Icon(Icons.arrow_back),
-                tooltip: 'Back',
+                tooltip: 'Atrás',
               ),
               const Spacer(),
               sortButton,
@@ -152,7 +153,7 @@ class _LikedHeader extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Liked Songs',
+                      'Canciones que me gustan',
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.headlineSmall?.copyWith(
@@ -162,8 +163,8 @@ class _LikedHeader extends StatelessWidget {
                     const SizedBox(height: 6),
                     Text(
                       count == 0
-                          ? 'Songs you like'
-                          : '$count song${count == 1 ? '' : 's'} · '
+                          ? 'Canciones que te gustan'
+                          : '$count ${count == 1 ? 'canción' : 'canciones'} · '
                               '${formatPlaylistDuration(totalDuration)}',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
@@ -180,7 +181,7 @@ class _LikedHeader extends StatelessWidget {
               IconButton.filled(
                 onPressed: onPlay,
                 icon: const Icon(Icons.play_arrow, size: 30),
-                tooltip: 'Play',
+                tooltip: 'Reproducir',
                 style: IconButton.styleFrom(
                   backgroundColor: theme.colorScheme.primary,
                   foregroundColor: theme.colorScheme.onPrimary,
@@ -193,7 +194,7 @@ class _LikedHeader extends StatelessWidget {
                   Icons.shuffle,
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
-                tooltip: 'Shuffle',
+                tooltip: 'Aleatorio',
               ),
             ],
           ),

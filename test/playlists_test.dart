@@ -71,7 +71,7 @@ Future<void> _openLibrary(WidgetTester tester) async {
   await tester.tap(
     find.descendant(
       of: find.byType(NavigationBar),
-      matching: find.text('Your Library'),
+      matching: find.text('Tu biblioteca'),
     ),
   );
   await tester.pumpAndSettle();
@@ -87,36 +87,36 @@ void main() {
     await _boot(tester);
     await _openLibrary(tester);
 
-    expect(find.text('Liked Songs'), findsOneWidget);
-    expect(find.text('Create Playlist'), findsOneWidget);
+    expect(find.text('Canciones que me gustan'), findsOneWidget);
+    expect(find.text('Crear lista'), findsOneWidget);
   });
 
   testWidgets('Creating a playlist adds it to the library', (tester) async {
     await _boot(tester);
     await _openLibrary(tester);
 
-    await tester.tap(find.text('Create Playlist'));
+    await tester.tap(find.text('Crear lista'));
     await tester.pumpAndSettle();
 
     await tester.enterText(find.byType(TextFormField).first, 'Road Trip');
-    await tester.tap(find.text('Create'));
+    await tester.tap(find.text('Crear'));
     await tester.pumpAndSettle();
 
     expect(find.text('Road Trip'), findsOneWidget);
-    expect(find.textContaining('0 songs'), findsOneWidget);
+    expect(find.textContaining('0 canciones'), findsOneWidget);
   });
 
   testWidgets('Dialog rejects an empty playlist name', (tester) async {
     await _boot(tester);
     await _openLibrary(tester);
 
-    await tester.tap(find.text('Create Playlist'));
+    await tester.tap(find.text('Crear lista'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Create'));
+    await tester.tap(find.text('Crear'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Give your playlist a name'), findsOneWidget);
+    expect(find.text('Ponle un nombre a tu lista'), findsOneWidget);
     expect(find.text('Road Trip'), findsNothing);
   });
 
@@ -136,11 +136,11 @@ void main() {
     await tester.pumpAndSettle();
 
     await _openLibrary(tester);
-    await tester.tap(find.text('Liked Songs'));
+    await tester.tap(find.text('Canciones que me gustan'));
     await tester.pumpAndSettle();
 
     expect(find.text('Song A'), findsOneWidget);
-    expect(find.textContaining('1 song'), findsOneWidget);
+    expect(find.textContaining('1 canción'), findsOneWidget);
   });
 
   testWidgets('Adding a song to a playlist via the context menu persists',
@@ -161,20 +161,20 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Add to playlist'));
+    await tester.tap(find.text('Añadir a la lista'));
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Gym Mix'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Added to Gym Mix'), findsOneWidget);
+    expect(find.text('Añadida a Gym Mix'), findsOneWidget);
 
     await _openLibrary(tester);
     await tester.tap(find.text('Gym Mix'));
     await tester.pumpAndSettle();
 
     expect(find.text('Song A'), findsOneWidget);
-    expect(find.textContaining('1 song'), findsOneWidget);
+    expect(find.textContaining('1 canción'), findsOneWidget);
   });
 
   testWidgets('Context menu does not overflow on short screens', (tester) async {
@@ -196,7 +196,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
-    expect(find.text('Play next'), findsOneWidget);
+    expect(find.text('Reproducir después'), findsOneWidget);
   });
 
   testWidgets('Playlist detail plays and reorders its songs', (tester) async {
@@ -214,7 +214,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Best of the library'), findsOneWidget);
-    expect(find.textContaining('2 songs'), findsOneWidget);
+    expect(find.textContaining('2 canciones'), findsOneWidget);
     expect(find.text('Song A'), findsOneWidget);
     expect(find.text('Song B'), findsOneWidget);
     expect(find.byType(ReorderableListView), findsOneWidget);

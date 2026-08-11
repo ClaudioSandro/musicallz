@@ -46,22 +46,22 @@ class AppBottomBar extends StatelessWidget {
         NavigationDestination(
           icon: Icon(Icons.home_outlined),
           selectedIcon: Icon(Icons.home),
-          label: 'Home',
+          label: 'Inicio',
         ),
         NavigationDestination(
           icon: Icon(Icons.search_outlined),
           selectedIcon: Icon(Icons.search),
-          label: 'Search',
+          label: 'Buscar',
         ),
         NavigationDestination(
           icon: Icon(Icons.library_music_outlined),
           selectedIcon: Icon(Icons.library_music),
-          label: 'Your Library',
+          label: 'Tu biblioteca',
         ),
         NavigationDestination(
           icon: Icon(Icons.settings_outlined),
           selectedIcon: Icon(Icons.settings),
-          label: 'Settings',
+          label: 'Ajustes',
         ),
       ],
     );

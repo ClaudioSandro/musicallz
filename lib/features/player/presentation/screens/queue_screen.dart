@@ -26,8 +26,8 @@ class QueueScreen extends ConsumerWidget {
           appBar: AppBar(),
           body: const EmptyState(
             icon: Icons.queue_music,
-            title: 'Nothing playing',
-            message: 'Start playing a song and its queue will show up here.',
+            title: 'Nada en reproducción',
+            message: 'Reproduce una canción y su cola aparecerá aquí.',
           ),
         ),
       );
@@ -42,26 +42,26 @@ class QueueScreen extends ConsumerWidget {
           leading: IconButton(
             onPressed: () => Navigator.of(context).pop(),
             icon: const Icon(Icons.arrow_back),
-            tooltip: 'Back',
+            tooltip: 'Atrás',
           ),
-          title: const Text('Queue', style: TextStyle(fontWeight: FontWeight.w700)),
+          title: const Text('Cola', style: TextStyle(fontWeight: FontWeight.w700)),
         ),
         body: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const _SectionLabel('NOW PLAYING'),
+              const _SectionLabel('REPRODUCIENDO AHORA'),
               _CurrentRow(song: current, index: currentIndex),
               const Divider(height: 24),
               _SectionLabel(
-                upcoming.isEmpty ? 'UP NEXT · EMPTY' : 'UP NEXT · ${upcoming.length}',
+                upcoming.isEmpty ? 'A CONTINUACIÓN · VACÍA' : 'A CONTINUACIÓN · ${upcoming.length}',
               ),
               if (upcoming.isEmpty)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                   child: Text(
-                    'Nothing next in the queue. Use "Play next" or "Add to queue" '
-                    'on any song to build it.',
+                    'Nada más en la cola. Usa "Reproducir después" o "Añadir a la cola" '
+                    'en cualquier canción para llenarla.',
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
@@ -177,7 +177,7 @@ class _CurrentRow extends ConsumerWidget {
               Icons.more_horiz,
               color: theme.colorScheme.onSurfaceVariant,
             ),
-            tooltip: 'Current song',
+            tooltip: 'Canción actual',
           ),
         ],
       ),
@@ -248,7 +248,7 @@ class _UpcomingRow extends StatelessWidget {
         icon: const Icon(Icons.close, size: 20),
         visualDensity: VisualDensity.compact,
         color: theme.colorScheme.onSurfaceVariant,
-        tooltip: 'Remove from queue',
+        tooltip: 'Quitar de la cola',
       ),
     );
   }

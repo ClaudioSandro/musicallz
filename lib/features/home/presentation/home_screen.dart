@@ -90,9 +90,9 @@ class HomeScreen extends ConsumerWidget {
                   data: (songs) => songs.isEmpty
                       ? const EmptyState(
                           icon: Icons.library_music_outlined,
-                          title: 'No songs found yet',
-                          message: 'Create the folder Music/MusicallzStorage '
-                              'and place MP3 files inside it.',
+                          title: 'Aún no hay canciones',
+                          message: 'Crea la carpeta Music/MusicallzStorage '
+                              'y coloca archivos MP3 dentro.',
                         )
                       : RefreshIndicator(
                           onRefresh: () =>
@@ -176,7 +176,7 @@ class _HomeContent extends ConsumerWidget {
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: AppDimens.pagePadding),
             child: SectionHeader(
-              title: 'Continue Listening',
+              title: 'Continúa escuchando',
               subtitle: 'EN CURSO',
             ),
           ),
@@ -190,7 +190,7 @@ class _HomeContent extends ConsumerWidget {
         ],
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: AppDimens.pagePadding),
-          child: SectionHeader(title: 'Recently Added'),
+          child: SectionHeader(title: 'Añadidos recientemente'),
         ),
         gap8,
         ...recent.map(
@@ -205,7 +205,7 @@ class _HomeContent extends ConsumerWidget {
           gap24,
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: AppDimens.pagePadding),
-            child: SectionHeader(title: 'Top Artists'),
+            child: SectionHeader(title: 'Artistas principales'),
           ),
           gap12,
           SizedBox(
@@ -234,7 +234,7 @@ class _HomeContent extends ConsumerWidget {
           gap24,
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: AppDimens.pagePadding),
-            child: SectionHeader(title: 'Albums'),
+            child: SectionHeader(title: 'Álbumes'),
           ),
           gap12,
           SizedBox(

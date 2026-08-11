@@ -22,7 +22,7 @@ class SettingsScreen extends StatelessWidget {
           padding: const EdgeInsets.all(AppDimens.pagePadding),
           children: [
             Text(
-              'Settings',
+              'Ajustes',
               style: theme.textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.w800,
               ),
@@ -115,6 +115,15 @@ class SettingsScreen extends StatelessWidget {
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ],
+              ),
+            ),
+            gap24,
+            Center(
+              child: Text(
+                'Hecho por Sandro Quispesivana',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
               ),
             ),
           ],

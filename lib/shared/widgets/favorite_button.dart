@@ -24,8 +24,8 @@ class FavoriteButton extends ConsumerWidget {
       },
       visualDensity: VisualDensity.compact,
       tooltip: isFavorite
-          ? 'Remove from Liked Songs'
-          : 'Add to Liked Songs',
+          ? 'Quitar de Canciones que me gustan'
+          : 'Añadir a Canciones que me gustan',
       icon: AnimatedSwitcher(
         duration: const Duration(milliseconds: 200),
         transitionBuilder: (child, animation) => ScaleTransition(

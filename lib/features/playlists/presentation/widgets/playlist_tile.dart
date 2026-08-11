@@ -16,7 +16,7 @@ class PlaylistTile extends StatelessWidget {
     final count = playlist.songIds.length;
     final updated = playlist.updatedAt;
 
-    final when = 'Updated '
+    final when = 'Actualizado '
         '${updated.year}-${updated.month.toString().padLeft(2, '0')}-'
         '${updated.day.toString().padLeft(2, '0')}';
 
@@ -30,7 +30,7 @@ class PlaylistTile extends StatelessWidget {
         style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
       ),
       subtitle: Text(
-        '$count ${count == 1 ? 'song' : 'songs'} · $when',
+        '$count ${count == 1 ? 'canción' : 'canciones'} · $when',
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: theme.textTheme.bodySmall?.copyWith(
@@ -47,7 +47,7 @@ String formatPlaylistDuration(Duration duration) {
   final hours = duration.inHours;
   final minutes = duration.inMinutes.remainder(60);
   final seconds = duration.inSeconds.remainder(60);
-  if (hours > 0) return '$hours hr $minutes min';
+  if (hours > 0) return '$hours h $minutes min';
   if (minutes > 0) return '$minutes min $seconds s';
-  return '${seconds}s';
+  return '$seconds s';
 }

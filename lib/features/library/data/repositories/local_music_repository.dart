@@ -12,9 +12,9 @@ import '../models/raw_media_metadata.dart';
 class LocalMusicRepository implements MusicRepository {
   LocalMusicRepository(this._datasource);
 
-  static const String unknownTitle = 'Unknown Title';
-  static const String unknownArtist = 'Unknown Artist';
-  static const String unknownAlbum = 'Unknown Album';
+  static const String unknownTitle = 'Título desconocido';
+  static const String unknownArtist = 'Artista desconocido';
+  static const String unknownAlbum = 'Álbum desconocido';
 
   final LocalMusicDatasource _datasource;
 
@@ -43,8 +43,8 @@ class LocalMusicRepository implements MusicRepository {
       files = await _datasource.findMp3Files(root);
     } on FileSystemException {
       throw const MusicLibraryScanException(
-        'Unable to read the Music folder. '
-        'Please check the storage permission.',
+        'No se pudo leer la carpeta Music. '
+        'Revisa el permiso de almacenamiento.',
       );
     }
 

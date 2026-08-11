@@ -62,10 +62,10 @@ void main() {
     await tester.pumpWidget(_app());
     await tester.pumpAndSettle();
 
-    expect(find.text('Home'), findsOneWidget);
-    expect(find.text('Search'), findsOneWidget);
-    expect(find.text('Your Library'), findsOneWidget);
-    expect(find.text('Settings'), findsOneWidget);
+    expect(find.text('Inicio'), findsOneWidget);
+    expect(find.text('Buscar'), findsOneWidget);
+    expect(find.text('Tu biblioteca'), findsOneWidget);
+    expect(find.text('Ajustes'), findsOneWidget);
     expect(find.text('Musicallz'), findsOneWidget);
   });
 
@@ -73,7 +73,7 @@ void main() {
     await tester.pumpWidget(_app());
     await tester.pumpAndSettle();
 
-    expect(find.text('Recently Added'), findsOneWidget);
+    expect(find.text('Añadidos recientemente'), findsOneWidget);
     expect(find.text('Song A'), findsOneWidget);
     expect(find.text('3:03'), findsOneWidget);
   });
@@ -82,7 +82,7 @@ void main() {
     await tester.pumpWidget(_app());
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Settings'));
+    await tester.tap(find.text('Ajustes'));
     await tester.pumpAndSettle();
     // The settings list grew (Appearance section), so scroll down to the
     // future-settings section before asserting it is rendered.
@@ -90,13 +90,13 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Configuraciones futuras'), findsOneWidget);
 
-    await tester.tap(find.text('Search'));
+    await tester.tap(find.text('Buscar'));
     await tester.pumpAndSettle();
-    expect(find.text('Qué quieres escuchar?'), findsOneWidget);
+    expect(find.text('¿Qué quieres escuchar?'), findsOneWidget);
 
-    await tester.tap(find.text('Your Library'));
+    await tester.tap(find.text('Tu biblioteca'));
     await tester.pumpAndSettle();
     expect(find.text('2 canciones'), findsOneWidget);
-    expect(find.text('Rescan Library'), findsOneWidget);
+    expect(find.text('Volver a escanear'), findsOneWidget);
   });
 }

@@ -99,7 +99,7 @@ class LibraryScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Your Library',
+                    'Tu biblioteca',
                     style: theme.textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.w800,
                     ),
@@ -123,7 +123,7 @@ class LibraryScreen extends ConsumerWidget {
                             : () => ref.read(musicLibraryProvider.notifier)
                                 .refresh(),
                         icon: const Icon(Icons.refresh),
-                        label: const Text('Rescan Library'),
+                        label: const Text('Volver a escanear'),
                       ),
                     ],
                   ),
@@ -135,7 +135,7 @@ class LibraryScreen extends ConsumerWidget {
                 duration: const Duration(milliseconds: 400),
                 child: library.when(
                   loading: () =>
-                      const LoadingState(message: 'Scanning your music...'),
+                      const LoadingState(message: 'Escaneando tu música...'),
                   error: (error, stackTrace) => ErrorState(
                     message: describeLibraryError(error),
                     onRetry: () =>
@@ -144,10 +144,10 @@ class LibraryScreen extends ConsumerWidget {
                   data: (songs) => songs.isEmpty
                       ? const EmptyState(
                           icon: Icons.library_music_outlined,
-                          title: 'No songs found yet',
+                          title: 'Aún no hay canciones',
                           message:
-                              'Create the folder Music/MusicallzStorage '
-                              'and place MP3 files inside it.',
+                              'Crea la carpeta Music/MusicallzStorage '
+                              'y coloca archivos MP3 dentro.',
                         )
                       : DefaultTabController(
                           length: 4,
@@ -195,10 +195,10 @@ class _LibraryTabBar extends StatelessWidget {
           theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
       dividerColor: Colors.transparent,
       tabs: const [
-        Tab(text: 'Playlists'),
-        Tab(text: 'Artists'),
-        Tab(text: 'Albums'),
-        Tab(text: 'Songs'),
+        Tab(text: 'Listas'),
+        Tab(text: 'Artistas'),
+        Tab(text: 'Álbumes'),
+        Tab(text: 'Canciones'),
       ],
     );
   }
@@ -219,8 +219,8 @@ class _PlaylistsView extends ConsumerWidget {
     Future<void> createPlaylist(BuildContext context) async {
       final draft = await showPlaylistDialog(
         context,
-        title: 'New Playlist',
-        confirmLabel: 'Create',
+        title: 'Nueva lista',
+        confirmLabel: 'Crear',
       );
       if (draft == null || !context.mounted) return;
       await favoritesRepo.createPlaylist(
@@ -230,7 +230,7 @@ class _PlaylistsView extends ConsumerWidget {
     }
 
     Widget header(int count) => LibraryTabHeader(
-          title: 'Playlists',
+          title: 'Listas',
           count: count,
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
@@ -258,7 +258,7 @@ class _PlaylistsView extends ConsumerWidget {
 
     return ref.watch(playlistsProvider).when(
           skipLoadingOnRefresh: true,
-          loading: () => const LoadingState(message: 'Loading playlists...'),
+          loading: () => const LoadingState(message: 'Cargando listas...'),
           error: (error, _) => ErrorState(
             message: '$error',
             onRetry: () => ref.invalidate(playlistsProvider),
@@ -285,11 +285,11 @@ class _PlaylistsView extends ConsumerWidget {
                       ),
                     ),
                     title: const Text(
-                      'Create Playlist',
+                      'Crear lista',
                       style: TextStyle(fontWeight: FontWeight.w700),
                     ),
                     subtitle: Text(
-                      'Start a fresh collection',
+                      'Empieza una colección nueva',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
@@ -316,13 +316,13 @@ class _PlaylistsView extends ConsumerWidget {
                       child: const Icon(Icons.favorite, color: Colors.white),
                     ),
                     title: const Text(
-                      'Liked Songs',
+                      'Canciones que me gustan',
                       style: TextStyle(fontWeight: FontWeight.w700),
                     ),
                     subtitle: Text(
                       likedCount == 0
-                          ? 'Songs you like will appear here'
-                          : '$likedCount song${likedCount == 1 ? '' : 's'}',
+                          ? 'Las canciones que te gustan aparecerán aquí'
+                          : '$likedCount ${likedCount == 1 ? 'canción' : 'canciones'}',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
@@ -341,7 +341,7 @@ class _PlaylistsView extends ConsumerWidget {
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                       child: Text(
-                        'Your playlists will appear here.',
+                        'Tus listas aparecerán aquí.',
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
@@ -419,15 +419,15 @@ class _ArtistsView extends ConsumerWidget {
     if (artists.isEmpty) {
       return const EmptyState(
         icon: Icons.person_outline,
-        title: 'No artists yet',
-        message: 'Your artists will appear here once you add music.',
+        title: 'Aún no hay artistas',
+        message: 'Tus artistas aparecerán aquí cuando añadas música.',
       );
     }
 
     final sorted = sortArtists(artists, prefs.artistsSort);
 
     final header = LibraryTabHeader(
-      title: 'Artists',
+      title: 'Artistas',
       count: artists.length,
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
@@ -512,8 +512,8 @@ class _AlbumsView extends ConsumerWidget {
     if (albums.isEmpty) {
       return const EmptyState(
         icon: Icons.album_outlined,
-        title: 'No albums yet',
-        message: 'Your albums will appear here when you add music.',
+        title: 'Aún no hay álbumes',
+        message: 'Tus álbumes aparecerán aquí cuando añadas música.',
       );
     }
 
@@ -521,7 +521,7 @@ class _AlbumsView extends ConsumerWidget {
     final columns = view == AlbumsView.grid2 ? 2 : 3;
 
     final header = LibraryTabHeader(
-      title: 'Albums',
+      title: 'Álbumes',
       count: albums.length,
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
@@ -590,8 +590,8 @@ class _SongsView extends ConsumerWidget {
     if (songs.isEmpty) {
       return const EmptyState(
         icon: Icons.music_note,
-        title: 'No songs yet',
-        message: 'Your songs will appear here when you add music.',
+        title: 'Aún no hay canciones',
+        message: 'Tus canciones aparecerán aquí cuando añadas música.',
       );
     }
 
@@ -599,7 +599,7 @@ class _SongsView extends ConsumerWidget {
     final sorted = sortSongs(songs, prefs.songsSort);
 
     final header = LibraryTabHeader(
-      title: 'Songs',
+      title: 'Canciones',
       count: songs.length,
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
@@ -673,7 +673,7 @@ class _CreatePlaylistCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Create Playlist',
+            'Crear lista',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: theme.textTheme.bodyMedium?.copyWith(
@@ -682,7 +682,7 @@ class _CreatePlaylistCard extends StatelessWidget {
           ),
           const SizedBox(height: 2),
           Text(
-            'Start a fresh collection',
+            'Empieza una colección nueva',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: theme.textTheme.bodySmall?.copyWith(
@@ -731,7 +731,7 @@ class _LikedSongsCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Liked Songs',
+            'Canciones que me gustan',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: theme.textTheme.bodyMedium?.copyWith(
@@ -740,7 +740,7 @@ class _LikedSongsCard extends StatelessWidget {
           ),
           const SizedBox(height: 2),
           Text(
-            count == 0 ? 'Songs you like' : '$count songs',
+            count == 0 ? 'Canciones que te gustan' : '$count canciones',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: theme.textTheme.bodySmall?.copyWith(

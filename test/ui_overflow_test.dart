@@ -68,7 +68,7 @@ Future<void> _openLibrary(WidgetTester tester) async {
   await tester.tap(
     find.descendant(
       of: find.byType(NavigationBar),
-      matching: find.text('Your Library'),
+      matching: find.text('Tu biblioteca'),
     ),
   );
   await tester.pumpAndSettle();
@@ -103,14 +103,14 @@ void main() {
       (tester) async {
     await _boot(tester);
     await _openLibrary(tester);
-    await _openTab(tester, 'Albums');
+    await _openTab(tester, 'Álbumes');
     expect(tester.takeException(), isNull);
   });
 
   testWidgets('No overflow in album detail with long titles', (tester) async {
     await _boot(tester);
     await _openLibrary(tester);
-    await _openTab(tester, 'Albums');
+    await _openTab(tester, 'Álbumes');
 
     await tester.tap(find.byType(AlbumCard).first);
     await tester.pumpAndSettle();
@@ -120,7 +120,7 @@ void main() {
   testWidgets('No overflow in artist detail with long titles', (tester) async {
     await _boot(tester);
     await _openLibrary(tester);
-    await _openTab(tester, 'Artists');
+    await _openTab(tester, 'Artistas');
 
     await tester.tap(find.byType(ArtistTile).first);
     await tester.pumpAndSettle();
@@ -162,7 +162,7 @@ void main() {
     expect(tester.takeException(), isNull);
 
     await _openLibrary(tester);
-    await _openTab(tester, 'Albums');
+    await _openTab(tester, 'Álbumes');
     expect(tester.takeException(), isNull);
 
     await tester.tap(find.byType(AlbumCard).first);

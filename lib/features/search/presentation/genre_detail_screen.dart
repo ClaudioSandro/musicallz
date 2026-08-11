@@ -31,8 +31,8 @@ class GenreDetailScreen extends ConsumerWidget {
           appBar: AppBar(),
           body: const EmptyState(
             icon: Icons.category_outlined,
-            title: 'Genre not available',
-            message: 'Your library is still loading.',
+            title: 'Género no disponible',
+            message: 'Tu biblioteca todavía se está cargando.',
           ),
         ),
       );
@@ -49,7 +49,7 @@ class GenreDetailScreen extends ConsumerWidget {
           body: EmptyState(
             icon: Icons.category_outlined,
             title: genreName,
-            message: 'No songs found for this genre.',
+            message: 'No se encontraron canciones para este género.',
           ),
         ),
       );
@@ -115,10 +115,8 @@ class GenreDetailScreen extends ConsumerWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '${songs.length} canción'
-                            '${songs.length == 1 ? '' : 'es'} · '
-                            '${albums.length} álbum'
-                            '${albums.length == 1 ? '' : 'es'} · '
+                            '${songs.length} ${songs.length == 1 ? 'canción' : 'canciones'} · '
+                            '${albums.length} ${albums.length == 1 ? 'álbum' : 'álbumes'} · '
                             '${artists.length} artista'
                             '${artists.length == 1 ? '' : 's'}',
                             style: theme.textTheme.bodySmall?.copyWith(

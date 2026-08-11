@@ -13,12 +13,12 @@ class MusicLibraryScanException implements Exception {
 
 String describeLibraryError(Object error) {
   if (error is MusicLibraryPermissionDeniedException) {
-    return 'Storage permission is required to read your music.\n'
-        'Please grant access and try again.';
+    return 'Se necesita permiso de almacenamiento para leer tu música.\n'
+        'Otorga el acceso e inténtalo de nuevo.';
   }
   if (error is MusicLibraryScanException) {
     return error.message;
   }
-  return 'Something went wrong while scanning your music.\n'
-      'Please try again.';
+  return 'Ocurrió un problema al escanear tu música.\n'
+      'Inténtalo de nuevo.';
 }
